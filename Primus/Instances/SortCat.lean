@@ -18,7 +18,7 @@ def sortCat.{m}: Cat.{m+1, m} := {
 
 def sortCat.initial: InitialObject sortCat := {
   I := PEmpty
-  hom X := fun e => PEmpty.elim e
+  hom X := PEmpty.elim
   unique X g := by
     funext x
     cases x
@@ -26,7 +26,7 @@ def sortCat.initial: InitialObject sortCat := {
 
 def sortCat.terminal: TerminalObject sortCat := {
   T := PUnit
-  hom X := fun _ => PUnit.unit
+  hom X _ := PUnit.unit
   unique X g := by
     funext x
     cases g x
@@ -36,7 +36,7 @@ def sortCat.terminal: TerminalObject sortCat := {
 def sortCat.obToHom{A: sortCat.Ob}(x: A):
   sortCat.Hom sortCat.terminal A
 :=
-  fun _ => x
+  λ _ => x
 
 theorem sortCat.obToHom.injective(A: sortCat.Ob):
   Function.Injective (@obToHom A)
