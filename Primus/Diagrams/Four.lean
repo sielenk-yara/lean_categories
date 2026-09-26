@@ -1,6 +1,4 @@
 import Primus.Core.Category
-import Mathlib.Data.Fintype.Defs
-import Mathlib.Data.Fintype.Sets
 
 
 inductive FourOb.{m}: Type m
@@ -9,10 +7,6 @@ inductive FourOb.{m}: Type m
   | ob3: FourOb
   | ob4: FourOb
 deriving DecidableEq, Inhabited
-
-instance : Fintype FourOb where
-  elems := { FourOb.ob1, FourOb.ob2, FourOb.ob3, FourOb.ob4 }
-  complete X := by cases X <;> simp
 
 inductive FourHom.{m, n}: FourOb.{m} -> FourOb.{m} -> Type n
   | id1: FourHom FourOb.ob1 FourOb.ob1
@@ -26,21 +20,6 @@ inductive FourHom.{m, n}: FourOb.{m} -> FourOb.{m} -> Type n
   | f34: FourHom FourOb.ob3 FourOb.ob4
   | id4: FourHom FourOb.ob4 FourOb.ob4
 deriving DecidableEq
-
-instance {A B : FourOb} : Fintype (FourHom A B) where
-  elems := match A, B with
-    | .ob1, .ob1 => { FourHom.id1 }
-    | .ob1, .ob2 => { FourHom.f12 }
-    | .ob1, .ob3 => { FourHom.f13 }
-    | .ob1, .ob4 => { FourHom.f14 }
-    | .ob2, .ob2 => { FourHom.id2 }
-    | .ob2, .ob3 => { FourHom.f23 }
-    | .ob2, .ob4 => { FourHom.f24 }
-    | .ob3, .ob3 => { FourHom.id3 }
-    | .ob3, .ob4 => { FourHom.f34 }
-    | .ob4, .ob4 => { FourHom.id4 }
-    | _, _ => ∅
-  complete x := by cases x <;> simp
 
 def fourId(A: FourOb): FourHom A A :=
   match A with

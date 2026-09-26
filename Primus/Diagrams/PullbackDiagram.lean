@@ -1,8 +1,6 @@
 import Primus.Core.Category
 import Primus.Core.Functor
 import Primus.Limits.Lim
-import Mathlib.Data.Fintype.Defs
-import Mathlib.Data.Fintype.Sets
 
 
 inductive PullbackOb: Type
@@ -11,11 +9,6 @@ inductive PullbackOb: Type
   | B: PullbackOb
 deriving DecidableEq, Inhabited
 
-instance : Fintype PullbackOb where
-  elems := { PullbackOb.A₁, PullbackOb.A₂, PullbackOb.B }
-  complete X := by cases X <;> simp
-
-
 inductive PullbackHom: PullbackOb -> PullbackOb -> Type
   | idA₁: PullbackHom PullbackOb.A₁ PullbackOb.A₁
   | idA₂: PullbackHom PullbackOb.A₂ PullbackOb.A₂
@@ -23,16 +16,6 @@ inductive PullbackHom: PullbackOb -> PullbackOb -> Type
   | f₁: PullbackHom PullbackOb.A₁ PullbackOb.B
   | f₂: PullbackHom PullbackOb.A₂ PullbackOb.B
 deriving DecidableEq
-
-instance {X Y : PullbackOb} : Fintype (PullbackHom X Y) where
-  elems := match X, Y with
-    | .A₁, .A₁ => { PullbackHom.idA₁ }
-    | .A₂, .A₂ => { PullbackHom.idA₂ }
-    | .B,  .B  => { PullbackHom.idB }
-    | .A₁, .B  => { PullbackHom.f₁ }
-    | .A₂, .B  => { PullbackHom.f₂ }
-    | _, _ => ∅
-  complete x := by cases x <;> simp
 
 def pullbackId(A: PullbackOb): PullbackHom A A :=
   match A with

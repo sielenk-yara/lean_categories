@@ -38,12 +38,13 @@ def yonedaUp{CC: Cat}(F: Fun (op CC) sortCat)(X: CC.Ob):
 theorem yoneda{CC: Cat}(F: Fun (op CC) sortCat)(X: CC.Ob):
   isomorphic (NaturalTransformation (homFun X) F) (F X)
 := by
-  use yonedaDown F X, yonedaUp F X
+  refine ⟨yonedaDown F X, ?_⟩
+  refine ⟨yonedaUp F X, ?_⟩
   simp [sortCat, yonedaDown, yonedaUp]
   funext ⟨η, H1⟩; simp [homFun] at η H1
   congr
   funext Y f; simp
-  trans (λ x ↦ η Y (x ≪ f)) (CC.id X)
+  apply @Eq.trans _ _ ((λ x ↦ η Y (x ≪ f)) (CC.id X))
   rw [H1 f]
   simp
   rw [CC.left_id f]
@@ -77,9 +78,9 @@ def yonedaEmbedding(CC: Cat):
 theorem yoneda_fully_faithful(CC: Cat):
   fullyFaithful (yonedaEmbedding CC)
 := by
-  split_ands
+  constructor
   · intros X Y nt
-    use nt.η X (CC.id X)
+    refine ⟨nt.η X (CC.id X), ?_⟩
     simp [yonedaEmbedding]
     congr
     funext Z f

@@ -1,8 +1,6 @@
 import Primus.Core.Category
 import Primus.Core.Functor
 import Primus.Limits.Lim
-import Mathlib.Data.Fintype.Defs
-import Mathlib.Data.Fintype.Sets
 
 
 inductive EqualizerOb: Type
@@ -10,25 +8,12 @@ inductive EqualizerOb: Type
   | B: EqualizerOb
 deriving DecidableEq, Inhabited
 
-instance : Fintype EqualizerOb where
-  elems := { EqualizerOb.A, EqualizerOb.B }
-  complete X := by cases X <;> simp
-
-
 inductive EqualizerHom: EqualizerOb -> EqualizerOb -> Type
   | idA: EqualizerHom EqualizerOb.A EqualizerOb.A
   | idB: EqualizerHom EqualizerOb.B EqualizerOb.B
   | f₁: EqualizerHom EqualizerOb.A EqualizerOb.B
   | f₂: EqualizerHom EqualizerOb.A EqualizerOb.B
 deriving DecidableEq
-
-instance {X Y : EqualizerOb} : Fintype (EqualizerHom X Y) where
-  elems := match X, Y with
-    | .A, .A => { EqualizerHom.idA }
-    | .B, .B => { EqualizerHom.idB }
-    | .A, .B => { EqualizerHom.f₁, EqualizerHom.f₂ }
-    | .B, .A => ∅
-  complete x := by cases x <;> simp
 
 def equalizerDiagram: Cat := {
   Ob := EqualizerOb
