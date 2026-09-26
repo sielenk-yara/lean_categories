@@ -65,8 +65,8 @@ theorem sortCat.injective_to_mono{A B: sortCat.Ob}(f: sortCat.Hom A B):
   intro H1 X g1 g2 H2
   funext x
   apply H1
-  have H3: f (g1 x) = (f ≪ g1) x := by rfl
-  rw [H3, H2]
+  change (f ≪ g1) x = _
+  rw [H2]
   rfl
 
 theorem sortCat.mono_iff_injective{A B: sortCat.Ob}(f: sortCat.Hom A B):
@@ -78,8 +78,8 @@ theorem sortCat.epi_to_surjective{A B: sortCat.{m+1}.Ob}(f: sortCat.Hom A B):
   epi f → Function.Surjective f
 := by
   intro Hepi b
-  let g1: sortCat.Hom B _ := fun b' => ULift.up True
-  let g2: sortCat.Hom B _ := fun b' => ULift.up (∃a, f a = b')
+  let g1: sortCat.Hom B _ := λ b' => ULift.up True
+  let g2: sortCat.Hom B _ := λ b' => ULift.up (∃a, f a = b')
   change (g2 b).down
   rw [←Hepi g1 g2 ?_]
   exact True.intro
@@ -115,7 +115,7 @@ theorem sortCat.surjective_to_split_epi{A B: sortCat.Ob}(f: sortCat.Hom A B):
   Function.Surjective f → splitEpi f
 := by
   intro H1
-  refine ⟨fun b => Classical.choose (H1 b), ?_⟩
+  refine ⟨λ b => Classical.choose (H1 b), ?_⟩
   funext b
   exact Classical.choose_spec (H1 b)
 
@@ -145,15 +145,15 @@ def sortCat.Equalizer{X Y: sortCat.Ob}(f₁ f₂: sortCat.Hom X Y):
         | EqualizerHom.idA => sortCat.left_id _
         | EqualizerHom.idB => sortCat.left_id _
         | EqualizerHom.f₁ => rfl
-        | EqualizerHom.f₂ => funext (λ N => Eq.symm N.property)
+        | EqualizerHom.f₂ => funext (Eq.symm ·.property)
     }
     hom X := {
       h x := ⟨
         X.π EqualizerOb.A x,
          Eq.trans
-          (congrArg (λ h => h x) (X.comm EqualizerHom.f₁))
+          (congrArg (· x) (X.comm EqualizerHom.f₁))
           (Eq.symm
-            (congrArg (λ h => h x) (X.comm EqualizerHom.f₂))
+            (congrArg (· x) (X.comm EqualizerHom.f₂))
           )
       ⟩
       fac J := match J with
@@ -161,7 +161,7 @@ def sortCat.Equalizer{X Y: sortCat.Ob}(f₁ f₂: sortCat.Hom X Y):
         | EqualizerOb.B => X.comm EqualizerHom.f₁
     }
     unique _ g :=
-      ConeHom.ext (funext (λ_ => Subtype.ext (congrFun (g.fac EqualizerOb.A) _)))
+      ConeHom.ext (funext (λ _ => Subtype.ext (congrFun (g.fac EqualizerOb.A) _)))
   }
 
 def sortCat.Pullback{X₁ X₂ Y: sortCat.Ob}
@@ -179,15 +179,15 @@ by
         | PullbackHom.idA₂ => sortCat.left_id _
         | PullbackHom.idB => sortCat.left_id _
         | PullbackHom.f₁ => rfl
-        | PullbackHom.f₂ => funext (λ N => Eq.symm N.property)
+        | PullbackHom.f₂ => funext (Eq.symm ·.property)
     }
     hom X := {
       h x := ⟨
         ⟨X.π PullbackOb.A₁ x, X.π PullbackOb.A₂ x⟩,
         Eq.trans
-          (congrArg (λ h => h x) (X.comm PullbackHom.f₁))
+          (congrArg (· x) (X.comm PullbackHom.f₁))
           (Eq.symm
-            (congrArg (λ h => h x) (X.comm PullbackHom.f₂))
+            (congrArg (· x) (X.comm PullbackHom.f₂))
           )
       ⟩
       fac J := match J with
@@ -202,8 +202,8 @@ by
     funext x
     apply Subtype.ext
     apply Prod.ext
-    · apply congrArg (λ h => h x) (g.fac PullbackOb.A₁)
-    · apply congrArg (λ h => h x) (g.fac PullbackOb.A₂)
+    · apply congrArg (· x) (g.fac PullbackOb.A₁)
+    · apply congrArg (· x) (g.fac PullbackOb.A₂)
 
 def sortCat.Lim{JJ: Cat}(F: Fun JJ sortCat): Lim F :=
   {
