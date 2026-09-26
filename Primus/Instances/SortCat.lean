@@ -66,47 +66,23 @@ theorem sort_epi_surjective{A B: sortCat.{m+1}.Ob}(f: sortCat.Hom A B):
   epi f ↔ Function.Surjective f :=
 by
   constructor
-  · contrapose
-    intro H1
-    unfold Function.Surjective at H1
-    rw [@Classical.not_forall B] at H1
-    replace ⟨b, H1⟩ := H1
-    replace H1: ∀ a, ¬f a = b := by
-      intro a H2
-      apply H1
-      use a
-    let g1: sortCat.Hom B TwoOb := fun b' => TwoOb.ob1
-    let g2: sortCat.Hom B TwoOb := fun b' =>
-      match Classical.propDecidable (b' = b) with
-      | isTrue _  => TwoOb.ob2
-      | isFalse _ => TwoOb.ob1
-    intro H2
-    have H3: g1 b = g2 b := by
-      rw  [H2 g1 g2]
-      funext a
-      simp [sortCat]
-      unfold g1 g2
-      cases Classical.propDecidable (f a = b) with
-      | isFalse H =>
-        rfl
-      | isTrue H =>
-        exfalso
-        exact H1 a H
-    unfold g1 g2 at H3
-    revert H3
-    cases Classical.propDecidable (b = b) with
-    | isFalse H =>
-      contradiction
-    | isTrue H =>
-      simp
-  · intro H1 C g1 g2 H2
+  · intro Hepi b
+    let g1: sortCat.Hom B _ := fun b' => ULift.up True
+    let g2: sortCat.Hom B _ := fun b' => ULift.up (∃a, f a = b')
+    change (g2 b).down
+    have Heq: g1 = g2 := by
+      apply Hepi
+      funext a'
+      simp [sortCat, g1, g2]
+      exact ⟨a', rfl⟩
+    rw [←Heq]
+    exact True.intro
+  · intro Hsurj C g1 g2 Heq1
     funext b
-    have ⟨a, H3⟩ := H1 b
-    rw [←H3]
-    have H4: (g1 ≪ f) a = (g2 ≪ f) a := by
-      rw [H2]
-    simp [sortCat] at H4
-    assumption
+    have ⟨a, Heq2⟩ := Hsurj b
+    rw [←Heq2]
+    change (g1 ≪ f) a = (g2 ≪ f) a
+    rw [Heq1]
 
 theorem sort_split_epi_surjective{A B: sortCat.Ob}(f: sortCat.Hom A B):
   splitEpi f ↔ Function.Surjective f :=
