@@ -5,8 +5,6 @@ import Primus.Diagrams.Two
 import Primus.Limits.CoLim
 import Primus.Diagrams.EqualizerDiagram
 
-import Mathlib.Data.Set.Image
-
 
 def propCat: Cat.{1, 0} := {
   Ob := Prop,
