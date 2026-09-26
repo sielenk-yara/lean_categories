@@ -31,10 +31,10 @@ def propInitial: InitialObject propCat := {
 }
 
 theorem prop_mono{A B: propCat.Ob}(f: propCat.Hom A B): mono f :=
-  λ _ _ _ ↦ rfl
+  λ _ ↦ rfl
 
 theorem prop_epi{A B: propCat.Ob}(f: propCat.Hom A B): epi f :=
-  λ _ _ _ ↦ rfl
+  λ _ ↦ rfl
 
 theorem prop_thin: thin propCat :=
   λ _ _ _ _ ↦ rfl

@@ -81,7 +81,7 @@ theorem sortCat.epi_to_surjective{A B: sortCat.{m+1}.Ob}(f: sortCat.Hom A B):
   let g1: sortCat.Hom B _ := λ b' => ULift.up True
   let g2: sortCat.Hom B _ := λ b' => ULift.up (∃a, f a = b')
   change (g2 b).down
-  rw [←Hepi g1 g2 ?_]
+  rw [←@Hepi _ g1 g2 ?_]
   exact True.intro
   funext a'
   simp [sortCat, g1, g2]
@@ -140,7 +140,7 @@ def sortCat.Equalizer{X Y: sortCat.Ob}(f₁ f₂: sortCat.Hom X Y):
       N := { x // f₁ x = f₂ x }
       π J := match J with
         | EqualizerOb.A => Subtype.val
-        | EqualizerOb.B => λX => f₁ X.val
+        | EqualizerOb.B => (f₁ ·.val)
       comm f := match f with
         | EqualizerHom.idA => sortCat.left_id _
         | EqualizerHom.idB => sortCat.left_id _

@@ -74,10 +74,10 @@ section MorphismProperties
   variable (f: CC.Hom A B)
 
   def mono: Prop :=
-    ∀{X: CC.Ob}(g1 g2: CC.Hom X A), f ≪ g1 = f ≪ g2 → g1 = g2
+    ∀{X: CC.Ob}{g1 g2: CC.Hom X A}, f ≪ g1 = f ≪ g2 → g1 = g2
 
   def epi: Prop :=
-    ∀{X: CC.Ob}(g1 g2: CC.Hom B X), g1 ≪ f = g2 ≪ f → g1 = g2
+    ∀{X: CC.Ob}{g1 g2: CC.Hom B X}, g1 ≪ f = g2 ≪ f → g1 = g2
 
   def splitMono: Prop :=
     ∃(g: CC.Hom B A), g ≪ f = CC.id A
