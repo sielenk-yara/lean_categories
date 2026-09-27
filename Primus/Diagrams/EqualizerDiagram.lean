@@ -36,10 +36,10 @@ def equalizerDiagram: Cat.{1, 1} := {
     cases h <;> cases g <;> cases f <;> rfl
 }
 
-def equalizerDiagram.A: equalizerDiagram.Ob := EqualizerOb.A
-def equalizerDiagram.B: equalizerDiagram.Ob := EqualizerOb.B
-def equalizerDiagram.f₁: equalizerDiagram.Hom A B := EqualizerHom.f₁
-def equalizerDiagram.f₂: equalizerDiagram.Hom A B  := EqualizerHom.f₂
+abbrev equalizerDiagram.A: equalizerDiagram.Ob := EqualizerOb.A
+abbrev equalizerDiagram.B: equalizerDiagram.Ob := EqualizerOb.B
+abbrev equalizerDiagram.f₁: equalizerDiagram.Hom A B := EqualizerHom.f₁
+abbrev equalizerDiagram.f₂: equalizerDiagram.Hom A B  := EqualizerHom.f₂
 
 @[simp] theorem equalizerDiaOb: EqualizerOb = equalizerDiagram.Ob := rfl
 @[simp] theorem equalizerDiaHom: EqualizerHom = equalizerDiagram.Hom := rfl
@@ -78,15 +78,20 @@ def Equalizer.{m, n}{CC: Cat.{m, n}}{A B: CC.Ob}
 :=
   Lim (equalizerFunctor f₁ f₂)
 
-def Equalizer.mk{CC: Cat}{A B: CC.Ob}
-  (f₁: CC.Hom A B)(f₂: CC.Hom A B)
-  (E: CC.Ob)
-  (eq: CC.Hom E A)
+def Equalizer.mk{CC: Cat}{A B}(f₁ f₂: CC.Hom A B)
+  E (eq: CC.Hom E A)
   (H1: f₁ ≪ eq = f₂ ≪ eq)
-  (H2: ∀{O: CC.Ob}(m: CC.Hom O A), { u: CC.Hom O E // eq ≪ u = m })
-  (H3: ∀{O: CC.Ob}{u₁ u₂: CC.Hom O E}, eq ≪ u₁ = eq ≪ u₂ → u₁ = u₂):
+  (H2: ∀{O}(m: CC.Hom O A), f₁ ≪ m = f₂ ≪ m -> { u // eq ≪ u = m })
+  (H3: mono eq):
   Equalizer f₁ f₂
-:= {
+:= by
+  let H2'(X: (coneCat (equalizerFunctor f₁ f₂)).Ob) :=
+    H2 (X.π EqualizerOb.A)
+       (Eq.trans
+         (X.comm EqualizerHom.f₁)
+         (Eq.symm (X.comm EqualizerHom.f₂)))
+
+  refine {
     T := {
       N := E
       π J := match J with
@@ -99,8 +104,7 @@ def Equalizer.mk{CC: Cat}{A B: CC.Ob}
         | EqualizerHom.f₂ => Eq.symm H1
     }
     hom X := by
-      let ⟨h, Hh⟩ := H2 (X.π EqualizerOb.A)
-
+      let ⟨h, Hh⟩ := H2' X
       refine {
         h := h,
         fac J := match J with
@@ -113,7 +117,7 @@ def Equalizer.mk{CC: Cat}{A B: CC.Ob}
       apply CC.assoc
 
     unique X g := by
-      let ⟨h, Hh⟩ := H2 (X.π EqualizerOb.A)
+      let ⟨h, Hh⟩ := H2' X
       apply ConeHom.ext
       simp
       have Hg: eq ≪ g.h = X.π EqualizerOb.A := g.fac EqualizerOb.A

@@ -132,37 +132,26 @@ theorem sortCat.epi_to_split_epi.{m}{A B: sortCat.{m+1}.Ob}(f: sortCat.Hom A B):
   apply epi_to_surjective f H
 
 
-def sortCat.equalizer{X Y: sortCat.Ob}(f₁ f₂: sortCat.Hom X Y):
+def sortCat.equalizer{A B: sortCat.Ob}(f₁ f₂: sortCat.Hom A B):
   Equalizer f₁ f₂
 :=
-  {
-    T := {
-      N := { x // f₁ x = f₂ x }
-      π J := match J with
-        | EqualizerOb.A => Subtype.val
-        | EqualizerOb.B => (f₁ ·.val)
-      comm f := match f with
-        | EqualizerHom.idA => sortCat.left_id _
-        | EqualizerHom.idB => sortCat.left_id _
-        | EqualizerHom.f₁ => rfl
-        | EqualizerHom.f₂ => funext (Eq.symm ·.property)
-    }
-    hom X := {
-      h x := ⟨
-        X.π EqualizerOb.A x,
-         Eq.trans
-          (congrArg (· x) (X.comm EqualizerHom.f₁))
-          (Eq.symm
-            (congrArg (· x) (X.comm EqualizerHom.f₂))
-          )
-      ⟩
-      fac J := match J with
-        | EqualizerOb.A => rfl
-        | EqualizerOb.B => X.comm EqualizerHom.f₁
-    }
-    unique _ g :=
-      ConeHom.ext (funext (λ _ => Subtype.ext (congrFun (g.fac equalizerDiagram.A) _)))
-  }
+by
+  refine Equalizer.mk f₁ f₂ { a // f₁ a = f₂ a } Subtype.val
+    (funext Subtype.property) ?H2 ?H3
+  case H2 =>
+    intro O m Hm
+    refine ⟨λ o => ⟨m o, ?_⟩ , ?_⟩
+    . change (f₁ ≪ m) o = _
+      rw [Hm]
+      rfl
+    . funext o
+      rfl
+  case H3 =>
+    intro A' g₁ g₂ Hg
+    funext a
+    apply Subtype.ext
+    change (Subtype.val ≪ g₁) a = (Subtype.val ≪ g₂) a
+    rw [Hg]
 
 def sortCat.pullback{X₁ X₂ Y: sortCat.Ob}
   (f₁: sortCat.Hom X₁ Y)(f₂: sortCat.Hom X₂ Y): Pullback f₁ f₂ :=

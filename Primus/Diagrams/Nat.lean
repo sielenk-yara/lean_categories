@@ -20,21 +20,14 @@ def natCat.initial: InitialObject natCat :=
     unique _ _ := rfl
   }
 
+theorem natCat.is_mono{A B: natCat.Ob}(f: natCat.Hom A B): mono f :=
+  λ _ => rfl
+
 def natCat.equalizer{A B: natCat.Ob}(f₁ f₂: natCat.Hom A B): Equalizer f₁ f₂ :=
-  {
-    T := {
-      N := A
-      π J := match J with
-        | EqualizerOb.A => natCat.id _
-        | EqualizerOb.B => f₁
-      comm _ := rfl
-    }
-    hom X := {
-      h := X.π EqualizerOb.A
-      fac _ := rfl
-    }
-    unique _ _ := rfl
-  }
+  Equalizer.mk f₁ f₂ A (natCat.id A)
+    rfl
+    (λ m _ => ⟨m, rfl⟩)
+    (natCat.is_mono (natCat.id A))
 
 def natCat.pullback{A₁ A₂ B: natCat.Ob}
   (f₁: natCat.Hom A₁ B)(f₂: natCat.Hom A₂ B): Pullback f₁ f₂
