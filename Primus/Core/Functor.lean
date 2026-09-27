@@ -58,7 +58,7 @@ end FunctorProperties
     the *type*, where the two occur solely as `max m n`; the body uses them
     separately in `Ob := Cat.{m, n}`, so `CategoryCat.{0, 1}` and
     `CategoryCat.{1, 0}` have genuinely different objects. -/
-def CategoryCat.{m, n} : Cat.{(max m n) + 1, max 1 (max m n)} := {
+def categoryCat.{m, n} : Cat.{(max m n) + 1, max 1 (max m n)} := {
   Ob := Cat.{m, n}
   Hom := Fun.{m, n, m, n}
   id AA := {
@@ -78,7 +78,7 @@ def CategoryCat.{m, n} : Cat.{(max m n) + 1, max 1 (max m n)} := {
   assoc _ _ _ := by funext; rfl
 }
 
-def CategoryCat.terminal: TerminalObject CategoryCat := {
+def categoryCat.terminal: TerminalObject categoryCat := {
   T := one
   hom X := {
     onOb A := PUnit.unit
@@ -91,7 +91,7 @@ def CategoryCat.terminal: TerminalObject CategoryCat := {
 }
 
 theorem faithful_comp{AA BB CC}(G: Fun BB CC)(F: Fun AA BB):
-  faithful F -> faithful G → faithful (CategoryCat.compose G F)
+  faithful F -> faithful G → faithful (categoryCat.compose G F)
 := by
   intro H1 H2 A B f1 f2 H3
   apply H1
@@ -99,14 +99,14 @@ theorem faithful_comp{AA BB CC}(G: Fun BB CC)(F: Fun AA BB):
   assumption
 
 theorem full_comp{AA BB CC}(G: Fun BB CC)(F: Fun AA BB):
-  full F -> full G → full (CategoryCat.compose G F)
+  full F -> full G → full (categoryCat.compose G F)
 := by
   intro H1 H2 A B g
   let ⟨a, H3⟩ := (H2 g)
   let ⟨b, H4⟩ := (H1 a)
   exists b
   rw [←H3, ←H4]
-  simp [CategoryCat]
+  simp [categoryCat]
 
 
 def equivalent(CC DD: Cat): Prop :=
