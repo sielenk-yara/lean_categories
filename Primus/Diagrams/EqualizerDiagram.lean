@@ -88,8 +88,8 @@ def Equalizer.mk{CC: Cat}{A B}(f₁ f₂: CC.Hom A B)
   let H2'(X: (coneCat (equalizerFunctor f₁ f₂)).Ob) :=
     H2 (X.π EqualizerOb.A)
        (Eq.trans
-         (X.comm EqualizerHom.f₁)
-         (Eq.symm (X.comm EqualizerHom.f₂)))
+         (X.comm equalizerDiagram.f₁)
+         (Eq.symm (X.comm equalizerDiagram.f₂)))
 
   refine {
     T := {
@@ -112,7 +112,7 @@ def Equalizer.mk{CC: Cat}{A B}(f₁ f₂: CC.Hom A B)
           | EqualizerOb.B => ?_
       }
       simp
-      rw [←X.comm EqualizerHom.f₁, ←Hh]
+      rw [←X.comm equalizerDiagram.f₁, ←Hh]
       apply Eq.symm
       apply CC.assoc
 
@@ -120,8 +120,56 @@ def Equalizer.mk{CC: Cat}{A B}(f₁ f₂: CC.Hom A B)
       let ⟨h, Hh⟩ := H2' X
       apply ConeHom.ext
       simp
-      have Hg: eq ≪ g.h = X.π EqualizerOb.A := g.fac EqualizerOb.A
+      have Hg: eq ≪ g.h = X.π equalizerDiagram.A := g.fac equalizerDiagram.A
       rw [←Hg] at Hh
       apply Eq.symm
       apply H3 Hh
   }
+
+def Equalizer.E{CC: Cat.{m, n}}{A B: CC.Ob}
+  {f₁: CC.Hom A B}{f₂: CC.Hom A B}
+  (e: Equalizer f₁ f₂): CC.Ob
+:=
+  e.T.N
+
+def Equalizer.eq{CC: Cat.{m, n}}{A B: CC.Ob}
+  {f₁: CC.Hom A B}{f₂: CC.Hom A B}
+  (e:Equalizer f₁ f₂):
+  CC.Hom e.E A
+:=
+  e.T.π equalizerDiagram.A
+
+theorem Equalizer.eq_is_mono{CC: Cat}{A B: CC.Ob}{f₁ f₂: CC.Hom A B}(E: Equalizer f₁ f₂):
+  mono E.eq
+:= by
+  intro O u₁ u₂ Hu
+  let X: ConeOb (equalizerFunctor f₁ f₂) := {
+    N := O
+    π J := match J with
+      | EqualizerOb.A => E.T.π equalizerDiagram.A ≪ u₁
+      | EqualizerOb.B => E.T.π equalizerDiagram.B ≪ u₁
+    comm f := match f with
+      | EqualizerHom.idA => CC.left_id _
+      | EqualizerHom.idB => CC.left_id _
+      | EqualizerHom.f₁ => by
+          sorry
+          /-
+          rw [CC.assoc]
+          exact congrArg (· ≪ u₁) (E.T.comm EqualizerHom.f₁)
+          -/
+      | EqualizerHom.f₂ => by
+          sorry
+          /-
+          rw [CC.assoc]
+          exact congrArg (· ≪ u₁) (E.T.comm EqualizerHom.f₂)
+          -/
+  }
+  let g₁: ConeHom X E.T := ⟨u₁, by intro J; cases J <;> rfl⟩
+  let g₂: ConeHom X E.T := ⟨u₂, by
+    intro J; cases J
+    · exact Hu.symm
+    · show E.T.π equalizerDiagram.B ≪ u₂ = E.T.π equalizerDiagram.B ≪ u₁
+      sorry
+      /-rw [←E.T.comm EqualizerHom.f₁, ←CC.assoc, ←CC.assoc, Hu]-/
+    ⟩
+  exact congrArg ConeHom.h (TerminalObject.hom_ext E g₁ g₂)

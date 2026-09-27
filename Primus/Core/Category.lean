@@ -28,6 +28,11 @@ structure InitialObject(CC: Cat): Sort _ where
 attribute [coe] InitialObject.I
 instance{CC}: Coe (InitialObject CC) CC.Ob where coe i := i.I
 
+theorem InitialObject.hom_ext{CC: Cat}(I: InitialObject CC){X: CC.Ob}
+  (f₁ f₂: CC.Hom I X): f₁ = f₂
+:=
+  Eq.trans (I.unique X f₁) (Eq.symm (I.unique X f₂))
+
 @[ext]
 theorem InitialObject.ext{CC: Cat}{A B: InitialObject CC}:
   A.I = B.I -> A = B
@@ -51,6 +56,11 @@ structure TerminalObject(CC: Cat): Sort _ where
 
 attribute [coe] TerminalObject.T
 instance{CC}: Coe (TerminalObject CC) CC.Ob where coe t := t.T
+
+theorem TerminalObject.hom_ext{CC: Cat}(T: TerminalObject CC){X: CC.Ob}
+  (f₁ f₂: CC.Hom X T): f₁ = f₂
+:=
+  Eq.trans (T.unique X f₁) (Eq.symm (T.unique X f₂))
 
 @[ext]
 theorem TerminalObject.ext{CC: Cat}{A B: TerminalObject CC}:
