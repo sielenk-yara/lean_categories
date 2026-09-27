@@ -53,6 +53,11 @@ section FunctorProperties
 end FunctorProperties
 
 
+/-- The `checkUnivs` warning on this declaration is a false positive, so do not
+    "fix" it by collapsing `m` and `n` into one level. The linter only inspects
+    the *type*, where the two occur solely as `max m n`; the body uses them
+    separately in `Ob := Cat.{m, n}`, so `CategoryCat.{0, 1}` and
+    `CategoryCat.{1, 0}` have genuinely different objects. -/
 def CategoryCat.{m, n} : Cat.{(max m n) + 1, max 1 (max m n)} := {
   Ob := Cat.{m, n}
   Hom := Fun.{m, n, m, n}

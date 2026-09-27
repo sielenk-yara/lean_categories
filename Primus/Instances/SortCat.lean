@@ -153,7 +153,7 @@ by
     change (Subtype.val ≪ g₁) a = (Subtype.val ≪ g₂) a
     rw [Hg]
 
-def sortCat.pullback{X₁ X₂ Y: sortCat.Ob}
+def sortCat.pullback.{u}{X₁ X₂ Y: sortCat.{u+1}.Ob}
   (f₁: sortCat.Hom X₁ Y)(f₂: sortCat.Hom X₂ Y): Pullback f₁ f₂ :=
 by
   refine {
