@@ -16,13 +16,7 @@ def propCat: Cat.{1, 0} := {
   assoc _ _ _ := rfl
 }
 
-def propTerminal: TerminalObject propCat := {
-  T := True
-  hom _ _ := True.intro
-  unique _ _ := rfl
-}
-
-def propInitial: InitialObject propCat := {
+def propCat.initial: InitialObject propCat := {
   I := False
   hom X := False.elim
   unique X g := by
@@ -30,16 +24,22 @@ def propInitial: InitialObject propCat := {
     exact x.elim
 }
 
-theorem prop_mono{A B: propCat.Ob}(f: propCat.Hom A B): mono f :=
+def propCat.terminal: TerminalObject propCat := {
+  T := True
+  hom _ _ := True.intro
+  unique _ _ := rfl
+}
+
+theorem propCat.is_mono{A B: propCat.Ob}(f: propCat.Hom A B): mono f :=
   λ _ ↦ rfl
 
-theorem prop_epi{A B: propCat.Ob}(f: propCat.Hom A B): epi f :=
+theorem propCat.is_epi{A B: propCat.Ob}(f: propCat.Hom A B): epi f :=
   λ _ ↦ rfl
 
-theorem prop_thin: thin propCat :=
+theorem propCat.is_thin: thin propCat :=
   λ _ _ _ _ ↦ rfl
 
-def propCat.Lim{JJ: Cat}(F: Fun JJ propCat): Lim F := {
+def propCat.lim{JJ: Cat}(F: Fun JJ propCat): Lim F := {
   T := {
     N := ∀J, F J
     π J H := H J
@@ -52,7 +52,7 @@ def propCat.Lim{JJ: Cat}(F: Fun JJ propCat): Lim F := {
   unique _ _ := rfl
 }
 
-def propCat.CoLim{JJ: Cat}(F: Fun JJ propCat): CoLim F := {
+def propCat.coLim{JJ: Cat}(F: Fun JJ propCat): CoLim F := {
   I := {
     N := ∃J, F J
     π J H := ⟨J, H⟩

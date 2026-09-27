@@ -7,7 +7,7 @@
 | Inductive types, structures | `PascalCase` | `Cat`, `Fun`, `ConeOb`, `NaturalTransformation` |
 | Category/functor/def values | `camelCase` | `sortCat`, `two`, `equalizerDiagram`, `functorId` |
 | Namespace-qualified constructions | dot notation | `sortCat.Lim`, `sortCat.Equalizer`, `propCat.Limit` |
-| Theorem names | `snake_case` | `split_mono_is_mono`, `yoneda_fully_faithful` |
+| Theorem names | `snake_case` | `split_mono_to_mono`, `yoneda_fully_faithful` |
 
 
 ## Module structure

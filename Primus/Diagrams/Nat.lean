@@ -3,7 +3,7 @@ import Primus.Diagrams.EqualizerDiagram
 import Primus.Diagrams.PullbackDiagram
 
 
-def natCat: Cat := {
+def natCat: Cat.{1, 0} := {
   Ob := Nat
   Hom := Nat.le
   id _ := Nat.le.refl
@@ -20,7 +20,7 @@ def natCat.initial: InitialObject natCat :=
     unique _ _ := rfl
   }
 
-def natCat.Equalizer{A B: natCat.Ob}(f₁ f₂: natCat.Hom A B): Equalizer f₁ f₂ :=
+def natCat.equalizer{A B: natCat.Ob}(f₁ f₂: natCat.Hom A B): Equalizer f₁ f₂ :=
   {
     T := {
       N := A
@@ -36,7 +36,7 @@ def natCat.Equalizer{A B: natCat.Ob}(f₁ f₂: natCat.Hom A B): Equalizer f₁ 
     unique _ _ := rfl
   }
 
-def natCat.Pullback{A₁ A₂ B: natCat.Ob}
+def natCat.pullback{A₁ A₂ B: natCat.Ob}
   (f₁: natCat.Hom A₁ B)(f₂: natCat.Hom A₂ B): Pullback f₁ f₂
 :=
   {

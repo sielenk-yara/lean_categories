@@ -132,7 +132,7 @@ theorem sortCat.epi_to_split_epi.{m}{A B: sortCat.{m+1}.Ob}(f: sortCat.Hom A B):
   apply epi_to_surjective f H
 
 
-def sortCat.Equalizer{X Y: sortCat.Ob}(f₁ f₂: sortCat.Hom X Y):
+def sortCat.equalizer{X Y: sortCat.Ob}(f₁ f₂: sortCat.Hom X Y):
   Equalizer f₁ f₂
 :=
   {
@@ -161,10 +161,10 @@ def sortCat.Equalizer{X Y: sortCat.Ob}(f₁ f₂: sortCat.Hom X Y):
         | EqualizerOb.B => X.comm EqualizerHom.f₁
     }
     unique _ g :=
-      ConeHom.ext (funext (λ _ => Subtype.ext (congrFun (g.fac EqualizerOb.A) _)))
+      ConeHom.ext (funext (λ _ => Subtype.ext (congrFun (g.fac equalizerDiagram.A) _)))
   }
 
-def sortCat.Pullback{X₁ X₂ Y: sortCat.Ob}
+def sortCat.pullback{X₁ X₂ Y: sortCat.Ob}
   (f₁: sortCat.Hom X₁ Y)(f₂: sortCat.Hom X₂ Y): Pullback f₁ f₂ :=
 by
   refine {
@@ -205,7 +205,7 @@ by
     · apply congrArg (· x) (g.fac PullbackOb.A₁)
     · apply congrArg (· x) (g.fac PullbackOb.A₂)
 
-def sortCat.Lim{JJ: Cat}(F: Fun JJ sortCat): Lim F :=
+def sortCat.lim{JJ: Cat}(F: Fun JJ sortCat): Lim F :=
   {
     T := {
       N := { X // ∀{J₁ J₂} f, F.onHom f (X J₁) = X J₂ }

@@ -21,16 +21,19 @@ def commaCat: Cat := {
   Hom := CommaHom S T,
   id X := ⟨AA.id X.A, BB.id X.B, by simp⟩
   compose g f := ⟨g.f ≪ f.f, g.g ≪ f.g, by
-    simp only [Fun.map_comp]
+    simp
     rw [CC.assoc, g.comm, ← CC.assoc, ← CC.assoc, f.comm]
   ⟩
   left_id f := by
-    simp
+    simp only [Cat.left_id]
   right_id f := by
-    simp
+    simp only [Cat.right_id]
   assoc h g f := by
     simp
     and_intros
     apply AA.assoc
     apply BB.assoc
 }
+
+@[simp] theorem commaCatOb: CommaOb S T = (commaCat S T).Ob := rfl
+@[simp] theorem commaCatHom: CommaHom S T = (commaCat S T).Hom := rfl

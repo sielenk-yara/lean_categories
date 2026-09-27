@@ -7,41 +7,27 @@ structure NaturalTransformation{CC DD: Cat}(F G: Fun CC DD): Sort _ where
   naturality{A B: CC.Ob}(f: CC.Hom A B): η B ≪ F.onHom f = G.onHom f ≪ η A
 
 instance {CC DD: Cat} {F G: Fun CC DD} :
-    CoeFun (NaturalTransformation F G) (fun _ => ∀ A : CC.Ob, DD.Hom (F A) (G A)) where
+    CoeFun (NaturalTransformation F G) (λ _ => ∀ A : CC.Ob, DD.Hom (F A) (G A)) where
   coe α := α.η
-
-def natTransId{CC DD: Cat}(F: Fun CC DD): NaturalTransformation F F := {
-  η A := DD.id (F A),
-  naturality{A B} f := by
-    rw [DD.left_id, DD.right_id]
-}
-
-def natTransComp{CC DD: Cat}{F G H: Fun CC DD}
-  (ntG: NaturalTransformation G H)
-  (ntF: NaturalTransformation F G): NaturalTransformation F H := {
-  η A := ntG A ≪ ntF A,
-  naturality{A B} f := by
-    rw [DD.assoc, ←ntG.naturality f, ←DD.assoc, ntF.naturality f, DD.assoc]
-  }
 
 def functorCat(CC DD: Cat): Cat := {
   Ob := Fun CC DD,
   Hom := NaturalTransformation,
-  id := natTransId,
-  compose := natTransComp,
-  left_id {A B} f := by
-    unfold natTransComp natTransId
-    cases f
-    simp
-  right_id {A B} f := by
-    unfold natTransComp natTransId
-    cases f
-    simp
-  assoc {A B C D} h g f := by
-    unfold natTransComp
-    cases h
-    cases g
-    cases f
+  id F := {
+    η A := DD.id (F A),
+    naturality f := by
+      rw [DD.left_id, DD.right_id]
+  },
+  compose ntG ntF := {
+    η A := ntG A ≪ ntF A,
+    naturality f := by
+      rw [DD.assoc, ←ntG.naturality f, ←DD.assoc, ntF.naturality f, DD.assoc]
+    },
+  left_id f := by
+    simp only [Cat.left_id]
+  right_id f := by
+    simp only [Cat.right_id]
+  assoc h g f := by
     simp
     funext
     rw [DD.assoc]

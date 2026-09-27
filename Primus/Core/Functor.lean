@@ -3,27 +3,25 @@ import Primus.Diagrams.Zero
 import Primus.Diagrams.One
 
 
-structure Fun(CC DD: Cat) : Sort _ where
+structure Fun(CC DD: Cat): Sort _ where
   onOb: CC.Ob -> DD.Ob
   onHom{A B: CC.Ob}: CC.Hom A B -> DD.Hom (onOb A) (onOb B)
   id{A: CC.Ob}: onHom (CC.id A) = DD.id (onOb A)
   compose{A B C: CC.Ob}{g: CC.Hom B C}{f: CC.Hom A B}:
          onHom (g ≪ f) = onHom g ≪ onHom f
 
-instance {CC DD: Cat} : CoeFun (Fun CC DD) (fun _ => CC.Ob → DD.Ob) where
+attribute [simp] Fun.id
+attribute [simp] Fun.compose
+
+instance {CC DD: Cat}: CoeFun (Fun CC DD) (λ _ => CC.Ob → DD.Ob) where
   coe F := F.onOb
-
-@[simp] theorem Fun.map_id {CC DD: Cat}(F: Fun CC DD){A: CC.Ob}:
-    F.onHom (CC.id A) = DD.id (F A) := F.id
-
-@[simp] theorem Fun.map_comp {CC DD: Cat}(F: Fun CC DD)
-    {A B C: CC.Ob}{g: CC.Hom B C}{f: CC.Hom A B}:
-    F.onHom (g ≪ f) = F.onHom g ≪ F.onHom f := F.compose
 
 @[ext]
 theorem Fun.ext{CC DD: Cat}{F G: Fun CC DD}
     (h_ob : ∀ A, F A = G A)
-    (h_hom : ∀{A B}(f : CC.Hom A B), F.onHom f ≍ G.onHom f) : F = G := by
+    (h_hom : ∀{A B}(f : CC.Hom A B), F.onHom f ≍ G.onHom f):
+    F = G
+:= by
   cases F with | mk Fob Fhom Fid Fcomp =>
   cases G with | mk Gob Ghom Gid Gcomp =>
   have hob : Fob = Gob := funext h_ob
@@ -55,59 +53,55 @@ section FunctorProperties
 end FunctorProperties
 
 
-def functorId(CC: Cat): Fun CC CC := {
-  onOb A := A,
-  onHom f:= f,
-  id{A} := Eq.refl (CC.id A),
-  compose{_ _ _ g f} := Eq.refl (g ≪ f)
-}
-
-def functorComp{AA BB CC}(G: Fun BB CC)(F: Fun AA BB): Fun AA CC := {
-  onOb A := G (F A),
-  onHom f := G.onHom (F.onHom f),
-  id{A} := by simp,
-  compose{A B C g f} := by simp
-}
-
-def CategoryCat : Cat := {
-  Ob := Cat,
-  Hom := Fun,
-  id := functorId,
-  compose := functorComp,
+def CategoryCat.{m, n} : Cat.{(max m n) + 1, max 1 (max m n)} := {
+  Ob := Cat.{m, n}
+  Hom := Fun.{m, n, m, n}
+  id AA := {
+    onOb A := A
+    onHom f:= f
+    id{A} := by simp only
+    compose := by simp only [implies_true]
+  },
+  compose G F := {
+    onOb A := G (F A),
+    onHom f := G.onHom (F.onHom f),
+    id := by simp,
+    compose := by simp
+  },
   left_id _ := by funext; rfl,
   right_id _ := by funext; rfl,
   assoc _ _ _ := by funext; rfl
 }
 
-def oneTerminal: TerminalObject CategoryCat := {
-  T := one,
+def CategoryCat.terminal: TerminalObject CategoryCat := {
+  T := one
   hom X := {
-    onOb A := PUnit.unit,
-    onHom f := PUnit.unit,
-    id := rfl,
+    onOb A := PUnit.unit
+    onHom f := PUnit.unit
+    id := rfl
     compose := rfl
-  },
+  }
   unique {CC} F := by
     congr
 }
 
 theorem faithful_comp{AA BB CC}(G: Fun BB CC)(F: Fun AA BB):
-  faithful F ∧ faithful G → faithful (functorComp G F) := by
-  intro ⟨H1, H2⟩ A B f1 f2 H3
+  faithful F -> faithful G → faithful (CategoryCat.compose G F)
+:= by
+  intro H1 H2 A B f1 f2 H3
   apply H1
   apply H2
   assumption
 
 theorem full_comp{AA BB CC}(G: Fun BB CC)(F: Fun AA BB):
-  full F ∧ full G → full (functorComp G F) := by
-  intro ⟨H1, H2⟩ A B g
+  full F -> full G → full (CategoryCat.compose G F)
+:= by
+  intro H1 H2 A B g
   let ⟨a, H3⟩ := (H2 g)
   let ⟨b, H4⟩ := (H1 a)
   exists b
-  rw [←H3]
-  unfold functorComp
-  simp
-  congr
+  rw [←H3, ←H4]
+  simp [CategoryCat]
 
 
 def equivalent(CC DD: Cat): Prop :=

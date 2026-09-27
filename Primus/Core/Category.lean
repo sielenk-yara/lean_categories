@@ -13,6 +13,12 @@ attribute [simp] Cat.left_id Cat.right_id
 infixl:80 " ≪ " => Cat.compose _
 infixl:80 " ≫ " => fun f g => g ≪ f
 
+open Lean PrettyPrinter in
+@[app_unexpander Cat.compose]
+def unexpandCatCompose: Unexpander
+  | `($_ $_ $g $f) => `($g ≪ $f)
+  | _ => throw ()
+
 
 structure InitialObject(CC: Cat): Sort _ where
   I: CC.Ob
@@ -23,7 +29,9 @@ attribute [coe] InitialObject.I
 instance{CC}: Coe (InitialObject CC) CC.Ob where coe i := i.I
 
 @[ext]
-theorem InitialObject.ext{CC: Cat}{A B: InitialObject CC}: A.I = B.I -> A = B := by
+theorem InitialObject.ext{CC: Cat}{A B: InitialObject CC}:
+  A.I = B.I -> A = B
+:= by
   let ⟨I, ha, Ha⟩ := A
   let ⟨I', hb, Hb⟩ := B
   simp
@@ -45,7 +53,9 @@ attribute [coe] TerminalObject.T
 instance{CC}: Coe (TerminalObject CC) CC.Ob where coe t := t.T
 
 @[ext]
-theorem TerminalObject.ext{CC: Cat}{A B: TerminalObject CC}: A.T = B.T -> A = B := by
+theorem TerminalObject.ext{CC: Cat}{A B: TerminalObject CC}:
+  A.T = B.T -> A = B
+:= by
   let ⟨T, ha, Ha⟩ := A
   let ⟨T', hb, Hb⟩ := B
   simp
@@ -94,32 +104,30 @@ section MorphismProperties
 end MorphismProperties
 
 
-theorem split_mono_is_mono{CC: Cat}{A B: CC.Ob}(f: CC.Hom A B):
-  splitMono f → mono f := by
+theorem split_mono_to_mono{CC: Cat}{A B: CC.Ob}(f: CC.Hom A B):
+  splitMono f → mono f
+:= by
   intro ⟨g, H1⟩ X g1 g2 H2
   rw [←CC.left_id g1, ←CC.left_id g2, ←H1, ←CC.assoc, ←CC.assoc, H2]
 
-theorem split_epi_is_epi{CC: Cat}{A B: CC.Ob}(f: CC.Hom A B):
-  splitEpi f → epi f := by
+theorem split_epi_to_epi{CC: Cat}{A B: CC.Ob}(f: CC.Hom A B):
+  splitEpi f → epi f
+:= by
   intro ⟨g, H1⟩ X g1 g2 H2
   rw [←CC.right_id g1, ←CC.right_id g2, ←H1, CC.assoc, CC.assoc, H2]
 
-theorem split_mono_epi_is_iso{CC: Cat}{A B: CC.Ob}(f: CC.Hom A B):
-  splitMono f ∧ epi f → iso f := by
-  intro ⟨⟨g, H1⟩, H2⟩
-  apply Exists.intro g
-  and_intros
-  · assumption
-  · apply H2
-    rw [←CC.assoc, H1]
-    simp
+theorem split_mono_epi_to_iso{CC: Cat}{A B: CC.Ob}(f: CC.Hom A B):
+  splitMono f -> epi f → iso f
+:= by
+  intro ⟨g, H1⟩ H2
+  refine ⟨g, ⟨H1, H2 ?_⟩⟩
+  rw [←CC.assoc, H1]
+  simp
 
-theorem split_epi_mono_is_iso{CC: Cat}{A B: CC.Ob}(f: CC.Hom A B):
-  splitEpi f ∧ mono f → iso f := by
-  intro ⟨⟨g, H1⟩, H2⟩
-  apply Exists.intro g
-  and_intros
-  · apply H2
-    rw [CC.assoc, H1]
-    simp
-  · assumption
+theorem split_epi_mono_to_iso{CC: Cat}{A B: CC.Ob}(f: CC.Hom A B):
+  splitEpi f -> mono f → iso f
+:= by
+  intro ⟨g, H1⟩ H2
+  refine ⟨g, ⟨H2 ?_, H1⟩⟩
+  rw [CC.assoc, H1]
+  simp
