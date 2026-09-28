@@ -126,13 +126,13 @@ def Equalizer.mk{CC: Cat}{A B}(f₁ f₂: CC.Hom A B)
       apply H3 Hh
   }
 
-def Equalizer.E{CC: Cat.{m, n}}{A B: CC.Ob}
+abbrev Equalizer.E{CC: Cat.{m, n}}{A B: CC.Ob}
   {f₁: CC.Hom A B}{f₂: CC.Hom A B}
   (e: Equalizer f₁ f₂): CC.Ob
 :=
   e.T.N
 
-def Equalizer.eq{CC: Cat.{m, n}}{A B: CC.Ob}
+abbrev Equalizer.eq{CC: Cat.{m, n}}{A B: CC.Ob}
   {f₁: CC.Hom A B}{f₂: CC.Hom A B}
   (e:Equalizer f₁ f₂):
   CC.Hom e.E A
@@ -145,31 +145,19 @@ theorem Equalizer.eq_is_mono{CC: Cat}{A B: CC.Ob}{f₁ f₂: CC.Hom A B}(E: Equa
   intro O u₁ u₂ Hu
   let X: ConeOb (equalizerFunctor f₁ f₂) := {
     N := O
-    π J := match J with
-      | EqualizerOb.A => E.T.π equalizerDiagram.A ≪ u₁
-      | EqualizerOb.B => E.T.π equalizerDiagram.B ≪ u₁
-    comm f := match f with
-      | EqualizerHom.idA => CC.left_id _
-      | EqualizerHom.idB => CC.left_id _
-      | EqualizerHom.f₁ => by
-          sorry
-          /-
-          rw [CC.assoc]
-          exact congrArg (· ≪ u₁) (E.T.comm EqualizerHom.f₁)
-          -/
-      | EqualizerHom.f₂ => by
-          sorry
-          /-
-          rw [CC.assoc]
-          exact congrArg (· ≪ u₁) (E.T.comm EqualizerHom.f₂)
-          -/
+    π J := E.T.π J ≪ u₁
+    comm f := by rw [CC.assoc, E.T.comm f]
   }
   let g₁: ConeHom X E.T := ⟨u₁, by intro J; cases J <;> rfl⟩
   let g₂: ConeHom X E.T := ⟨u₂, by
-    intro J; cases J
-    · exact Hu.symm
-    · show E.T.π equalizerDiagram.B ≪ u₂ = E.T.π equalizerDiagram.B ≪ u₁
-      sorry
-      /-rw [←E.T.comm EqualizerHom.f₁, ←CC.assoc, ←CC.assoc, Hu]-/
+    intro J
+    cases J
+    case A =>
+      exact Hu.symm
+    case B =>
+      change E.T.π equalizerDiagram.B ≪ u₂ = E.T.π equalizerDiagram.B ≪ u₁
+      rw [←E.T.comm EqualizerHom.f₁, ←CC.assoc, ←CC.assoc]
+      change _ ≪ (E.eq ≪ u₂) = _ ≪ (E.eq ≪ u₁)
+      rw [Hu]
     ⟩
-  exact congrArg ConeHom.h (TerminalObject.hom_ext E g₁ g₂)
+  exact congrArg ConeHom.h (E.hom_ext g₁ g₂)
