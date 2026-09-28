@@ -1,5 +1,39 @@
 # Conventions
 
+## Comments
+
+A comment earns its place only by saying something that is neither in the code
+nor recoverable from git. In practice that means warnings against plausible
+wrong refactors, and non-obvious invariants.
+
+Do not write a comment that restates what the code says. `/-- A universal
+morphism from `X` to `G` -/` above `UniversalMorphism X G` carries nothing; the
+signature already says it.
+
+Do not put code history in a comment. That is what git is for. Rationale,
+alternatives that were tried, and what changed belong in the commit message,
+which can be as long as it needs to be.
+
+Two examples that do earn their place:
+
+```lean
+/-! Not `commaCat (delta one X) G`: spelling `X` as a functor out of `one` leaves
+    `one`'s two universe levels unconstrained, so they survive as junk parameters
+    and trip `checkUnivs`. -/
+```
+
+The code records what was built, never what was rejected — without this someone
+deletes `UnderOb` and reuses `commaCat`.
+
+```lean
+/-! `underCat`/`overCat` are plain `def`s, so `simp` cannot see through them at
+    reducible transparency: a lemma stated over `UnderOb` rather than
+    `(underCat X G).Ob` is silently never tried. -/
+```
+
+Without this the bridge lemmas read as deletable tautologies.
+
+
 ## Naming
 
 | Kind | Convention | Examples |
@@ -37,6 +71,17 @@ known about a given category then shares one prefix.
 Dot notation fires on the first *explicit* argument of the namespace's type. If
 such an argument is made implicit the notation silently stops working, with no
 warning, so prefer keeping it explicit and first.
+
+
+## Building
+
+`lake build`. The project has no dependencies, so a clean build is seconds and
+needs no cache. Keep it that way: adding a `require` to `lakefile.lean` trades
+a 27-job build for a multi-thousand-job one.
+
+`#print axioms <name>` is the check that matters after touching anything in
+`Instances/`. `Classical.choice` should appear only where choice is genuinely
+being used; everything else stays constructive.
 
 
 ## Module structure
