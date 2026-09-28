@@ -1,5 +1,15 @@
 # Conventions
 
+## Questions
+
+A question is a request for an answer, not for work. Answer it and stop.
+
+This holds when the question sounds rhetorical or leading. "Why do we need
+both?" is still a question, and what it wants back is words, not a commit.
+
+Make changes when asked to make changes.
+
+
 ## Comments
 
 A comment earns its place only by saying something that is neither in the code
