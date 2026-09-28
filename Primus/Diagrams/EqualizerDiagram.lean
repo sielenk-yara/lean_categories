@@ -1,6 +1,7 @@
 import Primus.Core.Category
 import Primus.Core.Functor
 import Primus.Limits.Lim
+import Primus.Limits.CoLim
 
 
 inductive EqualizerOb: Type
@@ -105,21 +106,22 @@ def Equalizer.mk{CC: Cat}{A B}(f₁ f₂: CC.Hom A B)
     }
     hom X := by
       let ⟨h, Hh⟩ := H2' X
+
       refine {
         h := h,
         fac J := match J with
           | EqualizerOb.A => Hh
-          | EqualizerOb.B => ?_
+          | EqualizerOb.B => by
+              change f₁ ≪ eq ≪ h = _
+              rw [←X.comm equalizerDiagram.f₁, ←Hh]
+              change _ = f₁ ≪ (eq ≪ h)
+              rw [CC.assoc]
       }
-      simp
-      rw [←X.comm equalizerDiagram.f₁, ←Hh]
-      apply Eq.symm
-      apply CC.assoc
 
     unique X g := by
       let ⟨h, Hh⟩ := H2' X
       apply ConeHom.ext
-      simp
+      change g.h = h
       have Hg: eq ≪ g.h = X.π equalizerDiagram.A := g.fac equalizerDiagram.A
       rw [←Hg] at Hh
       apply Eq.symm
@@ -134,7 +136,7 @@ abbrev Equalizer.E{CC: Cat.{m, n}}{A B: CC.Ob}
 
 abbrev Equalizer.eq{CC: Cat.{m, n}}{A B: CC.Ob}
   {f₁: CC.Hom A B}{f₂: CC.Hom A B}
-  (e:Equalizer f₁ f₂):
+  (e: Equalizer f₁ f₂):
   CC.Hom e.E A
 :=
   e.T.π equalizerDiagram.A
@@ -148,9 +150,8 @@ theorem Equalizer.eq_is_mono{CC: Cat}{A B: CC.Ob}{f₁ f₂: CC.Hom A B}(E: Equa
     π J := E.T.π J ≪ u₁
     comm f := by rw [CC.assoc, E.T.comm f]
   }
-  let g₁: ConeHom X E.T := ⟨u₁, by intro J; cases J <;> rfl⟩
-  let g₂: ConeHom X E.T := ⟨u₂, by
-    intro J
+  let g₁: ConeHom X E.T := ⟨u₁, λ _ => rfl⟩
+  let g₂: ConeHom X E.T := ⟨u₂, λ J => by
     cases J
     case A =>
       exact Hu.symm
@@ -161,3 +162,93 @@ theorem Equalizer.eq_is_mono{CC: Cat}{A B: CC.Ob}{f₁ f₂: CC.Hom A B}(E: Equa
       rw [Hu]
     ⟩
   exact congrArg ConeHom.h (E.hom_ext g₁ g₂)
+
+
+def CoEqualizer.{m, n}{CC: Cat.{m, n}}{A B: CC.Ob}
+    (f₁: CC.Hom A B)(f₂: CC.Hom A B) : Sort _
+:=
+  CoLim (equalizerFunctor f₁ f₂)
+
+def CoEqualizer.mk{CC: Cat}{A B}(f₁ f₂: CC.Hom A B)
+  Q (q: CC.Hom B Q)
+  (H1: q ≪ f₁ = q ≪ f₂)
+  (H2: ∀{O}(m: CC.Hom B O), m ≪ f₁ = m ≪ f₂ -> { u // u ≪ q = m })
+  (H3: epi q):
+  CoEqualizer f₁ f₂
+:= by
+  let H2'(X: (coConeCat (equalizerFunctor f₁ f₂)).Ob) :=
+    H2 (X.π EqualizerOb.B)
+       (Eq.trans
+         (X.comm equalizerDiagram.f₁)
+         (Eq.symm (X.comm equalizerDiagram.f₂)))
+
+  refine {
+    I := {
+      N := Q
+      π J := match J with
+        | EqualizerOb.A => q ≪ f₁
+        | EqualizerOb.B => q
+      comm f := match f with
+        | EqualizerHom.idA => CC.right_id _
+        | EqualizerHom.idB => CC.right_id _
+        | EqualizerHom.f₁ => rfl
+        | EqualizerHom.f₂ => Eq.symm H1
+    }
+    hom X := by
+      let ⟨h, Hh⟩ := H2' X
+
+      refine {
+        h := h,
+        fac J := match J with
+          | EqualizerOb.A => by
+              change h ≪ (q ≪ f₁) = _
+              rw [←X.comm equalizerDiagram.f₁, ←Hh]
+              change _ = h ≪ q ≪ f₁
+              rw [CC.assoc]
+          | EqualizerOb.B => Hh
+      }
+
+    unique X g := by
+      let ⟨h, Hh⟩ := H2' X
+      apply CoConeHom.ext
+      change g.h = h
+      have Hg: g.h ≪ q = X.π equalizerDiagram.B := g.fac equalizerDiagram.B
+      rw [←Hg] at Hh
+      apply Eq.symm
+      apply H3 Hh
+  }
+
+abbrev CoEqualizer.Q{CC: Cat.{m, n}}{A B: CC.Ob}
+  {f₁: CC.Hom A B}{f₂: CC.Hom A B}
+  (e: CoEqualizer f₁ f₂): CC.Ob
+:=
+  e.I.N
+
+abbrev CoEqualizer.q{CC: Cat.{m, n}}{A B: CC.Ob}
+  {f₁: CC.Hom A B}{f₂: CC.Hom A B}
+  (e: CoEqualizer f₁ f₂):
+  CC.Hom B e.Q
+:=
+  e.I.π equalizerDiagram.B
+
+theorem CoEqualizer.q_is_epi{CC: Cat}{A B: CC.Ob}{f₁ f₂: CC.Hom A B}(E: CoEqualizer f₁ f₂):
+  epi E.q
+:= by
+  intro O u₁ u₂ Hu
+  let X: CoConeOb (equalizerFunctor f₁ f₂) := {
+    N := O
+    π J := u₁ ≪ E.I.π J
+    comm f := by rw [←CC.assoc, E.I.comm f]
+  }
+  let g₁: CoConeHom E.I X := ⟨u₁, λ _ => rfl⟩
+  let g₂: CoConeHom E.I X := ⟨u₂, λ J => by
+    cases J
+    case A =>
+      change u₂ ≪ E.I.π equalizerDiagram.A = u₁ ≪ E.I.π equalizerDiagram.A
+      rw [←E.I.comm EqualizerHom.f₁, CC.assoc, CC.assoc]
+      change _ ≪ E.q ≪ f₁ = _ ≪ E.q ≪ f₁
+      rw [Hu]
+    case B =>
+      exact Hu.symm
+    ⟩
+  exact congrArg CoConeHom.h (E.hom_ext g₁ g₂)

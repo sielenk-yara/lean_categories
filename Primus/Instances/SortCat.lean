@@ -134,8 +134,7 @@ theorem sortCat.epi_to_split_epi.{m}{A B: sortCat.{m+1}.Ob}(f: sortCat.Hom A B):
 
 def sortCat.equalizer{A B: sortCat.Ob}(f₁ f₂: sortCat.Hom A B):
   Equalizer f₁ f₂
-:=
-by
+:= by
   refine Equalizer.mk f₁ f₂ { a // f₁ a = f₂ a } Subtype.val
     (funext Subtype.property) ?H2 ?H3
   case H2 =>
@@ -152,6 +151,26 @@ by
     apply Subtype.ext
     change (Subtype.val ≪ g₁) a = (Subtype.val ≪ g₂) a
     rw [Hg]
+
+def sortCat.coequalizer{A B: sortCat.Ob}(f₁ f₂: sortCat.Hom A B):
+  CoEqualizer f₁ f₂
+:= by
+  refine CoEqualizer.mk f₁ f₂
+    (Quot (λ b₁ b₂ => ∃a, f₁ a = b₁ ∧ f₂ a = b₂))
+    (Quot.mk _)
+    ?H1 ?H2 ?H3
+  case H1 =>
+    funext a
+    exact Quot.sound ⟨a, rfl, rfl⟩
+  case H2 =>
+    intro O m Hm
+    refine ⟨Quot.lift m ?_, rfl⟩
+    intro b₁ b₂ ⟨a, Ha₁, Ha₂⟩
+    exact Ha₁ ▸ Ha₂ ▸ congrFun Hm a
+  case H3 =>
+    intro O g₁ g₂ Hg
+    exact funext (Quot.ind (congrFun Hg))
+
 
 def sortCat.pullback.{u}{X₁ X₂ Y: sortCat.{u+1}.Ob}
   (f₁: sortCat.Hom X₁ Y)(f₂: sortCat.Hom X₂ Y): Pullback f₁ f₂ :=
