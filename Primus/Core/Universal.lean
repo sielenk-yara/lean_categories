@@ -95,11 +95,61 @@ abbrev UniversalMorphism(X: CC.Ob)(G: Fun DD CC) :=
 abbrev CoUniversalMorphism(G: Fun DD CC)(X: CC.Ob) :=
   TerminalObject (overCat G X)
 
-
 abbrev Lim'{JJ: Cat}(F: Fun JJ CC) :=
   CoUniversalMorphism (deltaFun JJ CC) F
 
 theorem coneCat_equivalent_overCat{JJ: Cat}(F: Fun JJ CC):
   equivalent (coneCat F) (overCat (deltaFun JJ CC) F)
 := by
-  sorry
+  let AA := (coneCat F)
+  let BB := (overCat (deltaFun JJ CC) F)
+  change equivalent AA BB
+  let onOb : AA.Ob → BB.Ob := by
+      intro ⟨N, π, comm⟩
+      refine ⟨N, ⟨π, ?_⟩⟩
+      intros J₁ J₂ f
+      change _ ≪ CC.id N = _
+      rw [CC.right_id, ←comm f]
+      rfl
+  let onHom : {A B : AA.Ob} → AA.Hom A B → BB.Hom (onOb A) (onOb B) := by
+      intro ⟨A, Aπ, Acomm⟩ ⟨B, Bπ, Bcomm⟩ ⟨h, fac⟩
+      change CC.Hom A B at h
+      change ∀ J, Bπ J ≪ _ = Aπ J at fac
+      refine ⟨h, ?_⟩
+      apply NaturalTransformation.ext
+      change (Bπ · ≪ h) = Aπ
+      funext J
+      apply fac
+
+  refine ⟨{
+    onOb := onOb
+    onHom := onHom
+    id := by
+      intro A
+      apply OverHom.ext
+      rfl
+    compose := by
+      intros A B C g f
+      apply OverHom.ext
+      rfl
+  }, ⟨⟨?full, ?faithful⟩, ?essentiallySurjective⟩⟩
+  case full =>
+    intro A B h
+    refine ⟨⟨h.f, λ J => ?_⟩, rfl⟩
+    rw [←NaturalTransformation.mk.inj h.comm]
+    rfl
+  case faithful =>
+    intros A B f₁ f₂ H
+    apply ConeHom.ext (OverHom.mk.inj H)
+  case essentiallySurjective =>
+    intro B
+    simp only
+    refine ⟨ConeOb.mk B.B B.h.η ?comm, ?isomorphic⟩
+    case comm =>
+      intros J₁ J₂ f
+      apply Eq.trans (Eq.symm (B.h.naturality f))
+      apply CC.right_id
+    case isomorphic =>
+      refine iso_to_isomorphic ⟨CC.id B.B, ?_⟩ (id_is_iso _)
+      . apply Eq.trans (Cat.right_id _ _)
+        apply NaturalTransformation.ext (Eq.refl _)

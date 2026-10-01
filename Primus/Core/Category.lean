@@ -141,3 +141,16 @@ theorem split_epi_mono_to_iso{CC: Cat}{A B: CC.Ob}(f: CC.Hom A B):
   refine ⟨g, ⟨H2 ?_, H1⟩⟩
   rw [CC.assoc, H1]
   simp
+
+theorem iso_to_isomorphic{CC: Cat}{A B: CC.Ob}(f: CC.Hom A B):
+  iso f -> isomorphic A B
+:= by
+  intro ⟨g, ⟨H1, H2⟩⟩
+  exists f
+  exists g
+
+theorem id_is_iso{CC: Cat}(A: CC.Ob): iso (CC.id A) := by
+  exists CC.id A
+  and_intros
+  apply CC.left_id
+  apply CC.left_id
