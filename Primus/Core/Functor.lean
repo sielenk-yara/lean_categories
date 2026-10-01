@@ -53,6 +53,20 @@ section FunctorProperties
 end FunctorProperties
 
 
+def FunctorId.{m, n}(AA: Cat.{m, n}): Fun.{m, n, m, n} AA AA := {
+    onOb A := A
+    onHom f:= f
+    id{A} := by simp only
+    compose := by simp only [implies_true]
+}
+
+def FunctorComp{AA BB CC: Cat}(G: Fun BB CC)(F: Fun AA BB): Fun AA CC := {
+    onOb A := G (F A),
+    onHom f := G.onHom (F.onHom f),
+    id := by simp,
+    compose := by simp
+}
+
 /-- The `checkUnivs` warning on this declaration is a false positive, so do not
     "fix" it by collapsing `m` and `n` into one level. The linter only inspects
     the *type*, where the two occur solely as `max m n`; the body uses them
@@ -61,18 +75,8 @@ end FunctorProperties
 def categoryCat.{m, n} : Cat.{(max m n) + 1, max 1 (max m n)} := {
   Ob := Cat.{m, n}
   Hom := Fun.{m, n, m, n}
-  id AA := {
-    onOb A := A
-    onHom f:= f
-    id{A} := by simp only
-    compose := by simp only [implies_true]
-  },
-  compose G F := {
-    onOb A := G (F A),
-    onHom f := G.onHom (F.onHom f),
-    id := by simp,
-    compose := by simp
-  },
+  id := FunctorId,
+  compose := FunctorComp,
   left_id _ := by funext; rfl,
   right_id _ := by funext; rfl,
   assoc _ _ _ := by funext; rfl
@@ -106,7 +110,7 @@ theorem full_comp{AA BB CC}(G: Fun BB CC)(F: Fun AA BB):
   let ⟨b, H4⟩ := (H1 a)
   exists b
   rw [←H3, ←H4]
-  simp [categoryCat]
+  simp only [categoryCat, FunctorComp]
 
 
 def equivalent(CC DD: Cat): Prop :=
