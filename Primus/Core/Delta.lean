@@ -6,8 +6,8 @@ import Primus.Core.NatTrans
 def delta JJ {CC}(C: CC.Ob): Fun JJ CC := {
   onOb _ := C,
   onHom _ := CC.id C,
-  id := Eq.refl (CC.id C),
-  compose := Eq.symm (CC.left_id _)
+  preserves_id := Eq.refl (CC.id C),
+  preserves_compose := Eq.symm (CC.left_id _)
 }
 
 def deltaFun JJ CC: Fun CC (functorCat JJ CC) := {
@@ -16,8 +16,8 @@ def deltaFun JJ CC: Fun CC (functorCat JJ CC) := {
     η _ := f,
     naturality _ := Eq.trans (CC.right_id f) (Eq.symm (CC.left_id f))
   },
-  id := Eq.refl _,
-  compose := Eq.refl _
+  preserves_id := Eq.refl _,
+  preserves_compose := Eq.refl _
 }
 
 theorem deltaFun.faithful{JJ CC}[HJ: Nonempty JJ.Ob]:

@@ -29,7 +29,7 @@ def underCat(X: CC.Ob)(G: Fun DD CC): Cat := {
   Hom := UnderHom
   id P := ⟨DD.id P.B, by simp⟩
   compose g f := ⟨g.f ≪ f.f, by
-    rw [Fun.compose, ←CC.assoc, f.comm, g.comm]⟩
+    rw [Fun.preserves_compose, ←CC.assoc, f.comm, g.comm]⟩
   left_id f := by ext; simp
   right_id f := by ext; simp
   assoc h g f := by ext; apply DD.assoc
@@ -53,7 +53,7 @@ def overCat(G: Fun DD CC)(X: CC.Ob): Cat := {
   Hom := OverHom
   id P := ⟨DD.id P.B, by simp⟩
   compose g f := ⟨g.f ≪ f.f, by
-    rw [Fun.compose, CC.assoc, g.comm, f.comm]⟩
+    rw [Fun.preserves_compose, CC.assoc, g.comm, f.comm]⟩
   left_id f := by ext; simp
   right_id f := by ext; simp
   assoc h g f := by ext; apply DD.assoc
@@ -124,11 +124,11 @@ theorem coneCat_equivalent_overCat{JJ: Cat}(F: Fun JJ CC):
   refine ⟨{
     onOb := onOb
     onHom := onHom
-    id := by
+    preserves_id := by
       intro A
       apply OverHom.ext
       rfl
-    compose := by
+    preserves_compose := by
       intros A B C g f
       apply OverHom.ext
       rfl

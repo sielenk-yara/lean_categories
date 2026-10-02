@@ -67,9 +67,9 @@ def pullbackFunctor{CC: Cat}{A₁ A₂ B: CC.Ob}
     | PullbackHom.idB => CC.id B
     | PullbackHom.f₁ => f₁
     | PullbackHom.f₂ => f₂
-  id{X} := by
+  preserves_id{X} := by
     cases X <;> rfl,
-  compose{X Y Z g f} := by
+  preserves_compose{X Y Z g f} := by
     cases g <;> cases f <;> simp <;> rfl
 }
 
