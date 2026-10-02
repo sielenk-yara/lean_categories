@@ -8,10 +8,10 @@ import Primus.Instances.SortCat
 def homFun.{m, n}{CC: Cat.{m, n}}(X: CC.Ob): Fun (op CC) sortCat.{n} := {
   onOb := (op CC).Hom X,
   onHom := (op CC).compose,
-  id{A} := by
+  preserves_id{A} := by
     funext h
     simp only [Cat.right_id, sortCat]
-  compose{A B C g f} := by
+  preserves_compose{A B C g f} := by
     funext h
     exact CC.assoc h f g
 }
@@ -30,7 +30,7 @@ def yonedaUp{CC: Cat}(F: Fun (op CC) sortCat)(X: CC.Ob):
     naturality{A B} f := by
       funext g
       simp only [sortCat, homFun]
-      rw [@F.compose _ _ _ f g]
+      rw [@F.preserves_compose _ _ _ f g]
       simp only [sortCat]
   }
 
@@ -60,13 +60,13 @@ def yonedaEmbedding CC:
       funext g
       apply CC.assoc
   }
-  id := by
+  preserves_id := by
     simp [functorCat, sortCat, homFun]
     intro A
     congr
     funext B f
     simp only [Cat.left_id]
-  compose := by
+  preserves_compose := by
     simp [functorCat, sortCat, homFun]
     intro B C D h g
     congr

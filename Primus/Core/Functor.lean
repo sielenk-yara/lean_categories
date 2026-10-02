@@ -6,12 +6,12 @@ import Primus.Diagrams.One
 structure Fun(CC DD: Cat): Sort _ where
   onOb: CC.Ob -> DD.Ob
   onHom{A B: CC.Ob}: CC.Hom A B -> DD.Hom (onOb A) (onOb B)
-  id{A: CC.Ob}: onHom (CC.id A) = DD.id (onOb A)
-  compose{A B C: CC.Ob}{g: CC.Hom B C}{f: CC.Hom A B}:
+  preserves_id{A: CC.Ob}: onHom (CC.id A) = DD.id (onOb A)
+  preserves_compose{A B C: CC.Ob}{g: CC.Hom B C}{f: CC.Hom A B}:
          onHom (g ≪ f) = onHom g ≪ onHom f
 
-attribute [simp] Fun.id
-attribute [simp] Fun.compose
+attribute [simp] Fun.preserves_id
+attribute [simp] Fun.preserves_compose
 
 instance {CC DD: Cat}: CoeFun (Fun CC DD) (λ _ => CC.Ob → DD.Ob) where
   coe F := F.onOb
@@ -53,18 +53,18 @@ section FunctorProperties
 end FunctorProperties
 
 
-def FunctorId.{m, n}(AA: Cat.{m, n}): Fun.{m, n, m, n} AA AA := {
+def Fun.id.{m, n}(AA: Cat.{m, n}): Fun.{m, n, m, n} AA AA := {
     onOb A := A
     onHom f:= f
-    id{A} := by simp only
-    compose := by simp only [implies_true]
+    preserves_id{A} := by simp only
+    preserves_compose := by simp only [implies_true]
 }
 
-def FunctorComp{AA BB CC: Cat}(G: Fun BB CC)(F: Fun AA BB): Fun AA CC := {
+def Fun.compose{AA BB CC: Cat}(G: Fun BB CC)(F: Fun AA BB): Fun AA CC := {
     onOb A := G (F A),
     onHom f := G.onHom (F.onHom f),
-    id := by simp,
-    compose := by simp
+    preserves_id := by simp,
+    preserves_compose := by simp
 }
 
 /-- The `checkUnivs` warning on this declaration is a false positive, so do not
@@ -75,8 +75,8 @@ def FunctorComp{AA BB CC: Cat}(G: Fun BB CC)(F: Fun AA BB): Fun AA CC := {
 def categoryCat.{m, n} : Cat.{(max m n) + 1, max 1 (max m n)} := {
   Ob := Cat.{m, n}
   Hom := Fun.{m, n, m, n}
-  id := FunctorId,
-  compose := FunctorComp,
+  id := Fun.id,
+  compose := Fun.compose,
   left_id _ := by funext; rfl,
   right_id _ := by funext; rfl,
   assoc _ _ _ := by funext; rfl
@@ -87,8 +87,8 @@ def categoryCat.terminal: TerminalObject categoryCat := {
   hom X := {
     onOb A := PUnit.unit
     onHom f := PUnit.unit
-    id := rfl
-    compose := rfl
+    preserves_id := rfl
+    preserves_compose := rfl
   }
   unique {CC} F := by
     congr
@@ -110,7 +110,7 @@ theorem full_comp{AA BB CC}(G: Fun BB CC)(F: Fun AA BB):
   let ⟨b, H4⟩ := (H1 a)
   exists b
   rw [←H3, ←H4]
-  simp only [categoryCat, FunctorComp]
+  simp only [categoryCat, Fun.compose]
 
 
 def equivalent(CC DD: Cat): Prop :=

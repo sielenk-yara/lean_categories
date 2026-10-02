@@ -58,9 +58,9 @@ def equalizerFunctor.{m, n}{CC: Cat.{m, n}}{A B: CC.Ob}
     | EqualizerHom.idB => CC.id B
     | EqualizerHom.f₁ => f₁
     | EqualizerHom.f₂ => f₂
-  id{X} := by
+  preserves_id{X} := by
     cases X <;> rfl,
-  compose{X Y Z g f} := by
+  preserves_compose{X Y Z g f} := by
     cases g <;> cases f <;> simp <;> rfl
 }
 
