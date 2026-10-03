@@ -8,7 +8,7 @@ structure Cat.{m, n}: Sort _ where
   assoc{A B C D: Ob}(h: Hom C D)(g: Hom B C)(f: Hom A B):
          compose h (compose g f) = compose (compose h g) f
 
-attribute [simp] Cat.left_id Cat.right_id
+attribute [simp] Cat.left_id Cat.right_id Cat.assoc
 
 infixl:80 " ≪ " => Cat.compose _
 infixl:80 " ≫ " => fun f g => g ≪ f
@@ -22,8 +22,8 @@ def unexpandCatCompose: Unexpander
 
 structure InitialObject(CC: Cat): Sort _ where
   I: CC.Ob
-  hom(X: CC.Ob): CC.Hom I X
-  unique(X: CC.Ob): ∀g: CC.Hom I X, g = hom X
+  u(X: CC.Ob): CC.Hom I X
+  unique(X: CC.Ob): ∀g: CC.Hom I X, g = u X
 
 attribute [coe] InitialObject.I
 instance{CC}: Coe (InitialObject CC) CC.Ob where coe i := i.I
@@ -51,8 +51,8 @@ theorem InitialObject.ext{CC: Cat}{A B: InitialObject CC}:
 
 structure TerminalObject(CC: Cat): Sort _ where
   T: CC.Ob
-  hom(X: CC.Ob): CC.Hom X T
-  unique(X: CC.Ob): ∀g, g = hom X
+  u X: CC.Hom X T
+  unique X: ∀g, g = u X
 
 attribute [coe] TerminalObject.T
 instance{CC}: Coe (TerminalObject CC) CC.Ob where coe t := t.T
@@ -68,7 +68,7 @@ theorem TerminalObject.ext{CC: Cat}{A B: TerminalObject CC}:
 := by
   let ⟨T, ha, Ha⟩ := A
   let ⟨T', hb, Hb⟩ := B
-  simp
+  simp only [mk.injEq]
   intro H
   subst H
   constructor
@@ -89,6 +89,18 @@ def Cat.Iso.inverse{CC: Cat}{A B: CC.Ob}:
 := by
   intro ⟨f, g, H1, H2⟩
   exact ⟨g, f, H2, H1⟩
+
+def Cat.Iso.compose{CC: Cat}{A B C: CC.Ob}:
+  CC.Iso B C -> CC.Iso A B -> CC.Iso A C
+:= by
+  intros g f
+  refine ⟨g.f ≪ f.f, f.g ≪ g.g, ?_, ?_ ⟩
+  · apply Eq.trans (b := f.g ≪ (g.g ≪ g.f) ≪ f.f)
+    · simp only [CC.assoc]
+    · rw [g.gf_is_id, CC.right_id, f.gf_is_id]
+  · apply Eq.trans (b := g.f ≪ (f.f ≪ f.g) ≪ g.g)
+    · simp only [CC.assoc]
+    · rw [f.fg_is_id, CC.right_id, g.fg_is_id]
 
 @[ext]
 theorem Cat.Iso.ext{CC: Cat}{A B: CC.Ob}{i₁ i₂: CC.Iso A B}:
@@ -124,14 +136,14 @@ section MorphismProperties
   def epi: Prop :=
     ∀{X: CC.Ob}{g1 g2: CC.Hom B X}, g1 ≪ f = g2 ≪ f → g1 = g2
 
+  def inverse(g: CC.Hom B A): Prop :=
+    g ≪ f = CC.id A ∧ f ≪ g = CC.id B
+
   def splitMono: Prop :=
     ∃(g: CC.Hom B A), g ≪ f = CC.id A
 
   def splitEpi: Prop :=
     ∃(g: CC.Hom B A), f ≪ g = CC.id B
-
-  def inverse(g: CC.Hom B A): Prop :=
-    g ≪ f = CC.id A ∧ f ≪ g = CC.id B
 
   def iso: Prop :=
     ∃(g: CC.Hom B A), inverse f g
@@ -193,6 +205,13 @@ theorem id_is_iso{CC: Cat}(A: CC.Ob): iso (CC.id A) := by
   apply CC.left_id
   apply CC.left_id
 
+def id_as_iso{CC: Cat}(A: CC.Ob): CC.Iso A A :=
+  ⟨CC.id A, CC.id A, CC.left_id _, CC.left_id _⟩
+
+def eq_as_iso{CC: Cat}{A B: CC.Ob}(H: A = B): CC.Iso A B :=
+  match H with
+  | rfl => id_as_iso A
+
 
 def Cat.Iso.of_split_mono{CC: Cat}{A B: CC.Ob}(f: CC.Hom A B)(g: CC.Hom B A):
   g ≪ f = CC.id A -> epi f -> CC.Iso A B
@@ -209,3 +228,45 @@ def Cat.Iso.of_split_epi{CC: Cat}{A B: CC.Ob}(f: CC.Hom A B)(g: CC.Hom B A):
   refine ⟨f, g, H2 ?_, H1⟩
   rw [CC.assoc, H1]
   simp only [right_id, left_id]
+
+
+abbrev Cat.Iso.refl{CC: Cat} := @id_as_iso CC
+abbrev Cat.Iso.symm{CC: Cat} := @Cat.Iso.inverse CC
+abbrev Cat.Iso.trans{CC: Cat}{A B C} f g := @Cat.Iso.compose CC A B C g f
+
+instance{CC: Cat}: Trans CC.Iso CC.Iso CC.Iso where trans := Cat.Iso.trans
+
+
+def Cat.core(CC: Cat): Cat := {
+  Ob := CC.Ob,
+  Hom := CC.Iso,
+  id := id_as_iso,
+  compose g := g.compose,
+  left_id f := by
+    ext
+    simp only [Cat.Iso.compose, id_as_iso, Cat.left_id]
+  right_id f := by
+    ext
+    simp only [Cat.Iso.compose, id_as_iso, Cat.right_id]
+  assoc h g f:= by
+    ext
+    simp only [Cat.Iso.compose, Cat.assoc]
+}
+
+namespace Cat.core
+  @[ext]
+  theorem hom_ext{CC: Cat}{A B: CC.core.Ob}{i₁ i₂: CC.core.Hom A B}:
+    i₁.f = i₂.f -> i₁ = i₂
+  := Cat.Iso.ext
+
+  @[simp]
+  theorem compose_f{CC: Cat}{A B C: CC.core.Ob}
+    (g: CC.core.Hom B C)(f: CC.core.Hom A B):
+    (g ≪ f).f = g.f ≪ f.f
+  := rfl
+
+  @[simp]
+  theorem id_f{CC: Cat}(A: CC.core.Ob):
+    (CC.core.id A).f = CC.id A
+  := rfl
+end Cat.core

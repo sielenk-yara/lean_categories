@@ -7,12 +7,9 @@ def prodCat(CC DD: Cat): Cat := {
   id X := (CC.id X.1, DD.id X.2),
   compose g f:= (g.1 ≪ f.1, g.2 ≪ f.2),
   left_id f := by
-    simp
+    simp only [Cat.left_id]
   right_id f := by
-    simp
+    simp only [Cat.right_id]
   assoc h g f:= by
-    simp
-    and_intros
-    . apply CC.assoc
-    . apply DD.assoc
+    simp only [Cat.assoc]
 }

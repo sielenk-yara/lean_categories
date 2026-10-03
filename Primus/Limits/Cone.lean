@@ -34,12 +34,11 @@ def coneCat(F: Fun JJ CC): Cat := {
     rw [CC.assoc, g.fac, f.fac]
   ⟩
   left_id f := by
-    simp
+    simp only [Cat.left_id]
   right_id f := by
-    simp
+    simp only [Cat.right_id]
   assoc h g f := by
-    simp
-    apply CC.assoc
+    simp only [Cat.assoc]
 }
 
 @[simp] theorem coneCatOb {F: Fun JJ CC}: ConeOb F = (coneCat F).Ob  := rfl

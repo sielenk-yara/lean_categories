@@ -34,12 +34,11 @@ def coConeCat(F: Fun JJ CC): Cat := {
     rw [←CC.assoc, f.fac, g.fac]
   ⟩
   left_id f := by
-    simp
+    simp only [Cat.left_id]
   right_id f := by
-    simp
+    simp only [Cat.right_id]
   assoc h g f := by
-    simp
-    rw [CC.assoc]
+    simp only [Cat.assoc]
 }
 
 @[simp] theorem coConeCatOb {F: Fun JJ CC}: CoConeOb F = (coConeCat F).Ob  := rfl

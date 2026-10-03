@@ -18,7 +18,7 @@ def sortCat.{m}: Cat.{m+1, m} := {
 
 def sortCat.initial: InitialObject sortCat := {
   I := PEmpty
-  hom X := PEmpty.elim
+  u X := PEmpty.elim
   unique X g := by
     funext x
     cases x
@@ -26,7 +26,7 @@ def sortCat.initial: InitialObject sortCat := {
 
 def sortCat.terminal: TerminalObject sortCat := {
   T := PUnit
-  hom X _ := PUnit.unit
+  u X _ := PUnit.unit
   unique X g := by
     funext x
     cases g x
@@ -189,7 +189,7 @@ by
         | PullbackHom.f₁ => rfl
         | PullbackHom.f₂ => funext (Eq.symm ·.property)
     }
-    hom X := {
+    u X := {
       h x := ⟨
         ⟨X.π PullbackOb.A₁ x, X.π PullbackOb.A₂ x⟩,
         Eq.trans
@@ -224,7 +224,7 @@ def sortCat.lim{JJ: Cat}(F: Fun JJ sortCat): Lim F :=
         funext X
         exact X.property f
     }
-    hom X := {
+    u X := {
       h x := ⟨
         fun J => X.π J x,
         by

@@ -4,7 +4,7 @@ import Primus.Core.Functor
 @[ext]
 structure NaturalTransformation{CC DD: Cat}(F G: Fun CC DD): Sort _ where
   η: (A: CC.Ob) -> DD.Hom (F A) (G A)
-  naturality{A B: CC.Ob}(f: CC.Hom A B): η B ≪ F.onHom f = G.onHom f ≪ η A
+  naturality{A B}(f: CC.Hom A B): η B ≪ F.onHom f = G.onHom f ≪ η A
 
 instance {CC DD: Cat} {F G: Fun CC DD} :
     CoeFun (NaturalTransformation F G) (λ _ => ∀ A : CC.Ob, DD.Hom (F A) (G A)) where
@@ -16,7 +16,7 @@ structure NaturalIso{CC DD: Cat}(F G: Fun CC DD): Sort _ where
   η: (A: CC.Ob) -> DD.Iso (F A) (G A)
   naturality{A B}(f: CC.Hom A B): (η B).f ≪ F.onHom f = G.onHom f ≪ (η A).f
 
-instance {CC DD: Cat} {F G: Fun CC DD} :
+instance {CC DD: Cat}{F G: Fun CC DD} :
     CoeFun (NaturalIso F G) (λ _ => ∀ A : CC.Ob, DD.Iso (F A) (G A)) where
   coe α := α.η
 
@@ -102,7 +102,7 @@ def NaturalIso.ofIso{CC DD: Cat}{F G: Fun CC DD}(i: (functorCat CC DD).Iso F G):
 theorem NaturalIso.toIso_ofIso{CC DD: Cat}{F G: Fun CC DD}(i: (functorCat CC DD).Iso F G):
   (ofIso i).toIso = i
 := by
-  apply Cat.Iso.ext
+  ext
   apply NaturalTransformation.ext
   funext A
   rfl
@@ -113,3 +113,15 @@ theorem NaturalIso.ofIso_toIso{CC DD: Cat}{F G: Fun CC DD}(n: NaturalIso F G):
   apply NaturalIso.ext
   funext A
   rfl
+
+
+def NaturalIso.ofEq{CC DD: Cat}{F G: Fun CC DD}(H: F = G):
+  NaturalIso F G
+:= by
+  subst H
+  refine ⟨λA => id_as_iso (F A), λf => ?_⟩
+  simp only [id_as_iso, DD.left_id, DD.right_id]
+
+theorem NaturalIso.ofEq_eta{CC DD: Cat}{F G: Fun CC DD}(H: F = G)(A: CC.Ob):
+  (NaturalIso.ofEq H).η A = eq_as_iso (congrFun (congrArg Fun.onOb H) A)
+:= by cases H; rfl

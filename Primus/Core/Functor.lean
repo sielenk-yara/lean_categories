@@ -30,6 +30,33 @@ theorem Fun.ext{CC DD: Cat}{F G: Fun CC DD}
   funext A B f
   apply eq_of_heq (h_hom f)
 
+def Fun.onIso{CC DD: Cat}(F: Fun CC DD){A B: CC.Ob}:
+  CC.Iso A B -> DD.Iso (F.onOb A) (F.onOb B)
+:= by
+  intro ⟨f, g, H1, H2⟩
+  refine ⟨F.onHom f, F.onHom g, ?H1, ?H2⟩
+  case H1 =>
+    rw [←F.preserves_compose]
+    rw [H1]
+    simp only [F.preserves_id]
+  case H2 =>
+    rw [←F.preserves_compose]
+    rw [H2]
+    simp only [F.preserves_id]
+
+def fun_eq_as_iso{CC DD: Cat}{F G: Fun CC DD}(H: F = G)(A: CC.Ob):
+  DD.Iso (F A) (G A)
+:=
+  match H with
+  | rfl => id_as_iso _
+
+theorem Fun.congr_hom{CC DD: Cat}{F G: Fun CC DD}(H: F = G)
+  {X Y: CC.Ob}(f: CC.Hom X Y):
+  F.onHom f = (fun_eq_as_iso H Y).g ≪ G.onHom f ≪ (fun_eq_as_iso H X).f
+:= by
+  subst H
+  simp only [fun_eq_as_iso, id_as_iso, DD.left_id, DD.right_id]
+
 
 section FunctorProperties
   variable {CC DD: Cat}
@@ -67,6 +94,37 @@ def Fun.compose{AA BB CC: Cat}(G: Fun BB CC)(F: Fun AA BB): Fun AA CC := {
     preserves_compose := by simp
 }
 
+theorem Fun.left_id{CC DD: Cat}(F: Fun CC DD):
+  compose (id DD) F = F
+:= by
+  apply Fun.ext
+  intro A
+  rfl
+  intros A B f
+  apply heq_of_eq
+  rfl
+
+theorem Fun.right_id{CC DD: Cat}(F: Fun CC DD):
+  compose F (id CC) = F
+:= by
+  apply Fun.ext
+  intro A
+  rfl
+  intros A B f
+  apply heq_of_eq
+  rfl
+
+theorem Fun.assoc{AA BB CC DD: Cat}(H: Fun CC DD)(G: Fun BB CC)(F: Fun AA BB):
+         compose H (compose G F) = compose (compose H G) F
+:= by
+  apply Fun.ext
+  intro A
+  rfl
+  intros A B f
+  apply heq_of_eq
+  rfl
+
+
 /-- The `checkUnivs` warning on this declaration is a false positive, so do not
     "fix" it by collapsing `m` and `n` into one level. The linter only inspects
     the *type*, where the two occur solely as `max m n`; the body uses them
@@ -77,14 +135,14 @@ def categoryCat.{m, n} : Cat.{(max m n) + 1, max 1 (max m n)} := {
   Hom := Fun.{m, n, m, n}
   id := Fun.id,
   compose := Fun.compose,
-  left_id _ := by funext; rfl,
-  right_id _ := by funext; rfl,
-  assoc _ _ _ := by funext; rfl
+  left_id := Fun.left_id,
+  right_id := Fun.right_id,
+  assoc := Fun.assoc
 }
 
 def categoryCat.terminal: TerminalObject categoryCat := {
   T := one
-  hom X := {
+  u X := {
     onOb A := PUnit.unit
     onHom f := PUnit.unit
     preserves_id := rfl
@@ -93,6 +151,21 @@ def categoryCat.terminal: TerminalObject categoryCat := {
   unique {CC} F := by
     congr
 }
+
+def categoryCat.initial: InitialObject categoryCat := {
+  I := zero
+  u X := {
+    onOb A := A.elim
+    onHom f := f.elim
+    preserves_id {A} := A.elim
+    preserves_compose {A} := A.elim
+  }
+  unique{CC} F := by
+    apply Fun.ext
+    intro A; exact A.elim
+    intro A; exact A.elim
+}
+
 
 theorem faithful_comp{AA BB CC}(G: Fun BB CC)(F: Fun AA BB):
   faithful F -> faithful G → faithful (categoryCat.compose G F)

@@ -34,19 +34,17 @@ def yonedaUp{CC: Cat}(F: Fun (op CC) sortCat)(X: CC.Ob):
       simp only [sortCat]
   }
 
-theorem yoneda{CC: Cat}(F: Fun (op CC) sortCat)(X: CC.Ob):
-  isomorphic (NaturalTransformation (homFun X) F) (F X)
+def yoneda{CC: Cat}(F: Fun (op CC) sortCat)(X: CC.Ob):
+  sortCat.Iso (NaturalTransformation (homFun X) F) (F X)
 := by
-  refine ⟨yonedaDown F X, ?down⟩
-  refine ⟨yonedaUp F X, ?up⟩
-  simp [sortCat, yonedaDown, yonedaUp]
-  funext ⟨η, H1⟩; simp [homFun] at η H1
-  congr
-  funext Y f; simp
-  apply @Eq.trans _ _ ((λ x ↦ η Y (x ≪ f)) (CC.id X))
-  . rw [H1 f]
-  . simp
-    rw [CC.left_id f]
+  refine ⟨yonedaDown F X, yonedaUp F X, ?down, ?up⟩
+    <;> simp only [sortCat, yonedaDown, yonedaUp, Fun.preserves_id]
+  funext ⟨η, H⟩; simp [homFun] at η H
+  ext A f
+  show (λx => F.onHom f (η X x)) (CC.id X) = η A f
+  rw [←H f]
+  simp only
+  rw [CC.left_id f]
 
 def yonedaEmbedding CC:
   Fun CC (functorCat (op CC) sortCat)
@@ -55,13 +53,10 @@ def yonedaEmbedding CC:
   onHom {C D} h := {
     η C := CC.compose h
     naturality := by
-      simp [sortCat, homFun]
-      intro B A f
-      funext g
-      apply CC.assoc
+      simp only [sortCat, homFun, Cat.assoc, implies_true]
   }
   preserves_id := by
-    simp [functorCat, sortCat, homFun]
+    simp only [sortCat, functorCat, homFun]
     intro A
     congr
     funext B f

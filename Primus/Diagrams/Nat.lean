@@ -16,7 +16,7 @@ def natCat: Cat.{1, 0} := {
 def natCat.initial: InitialObject natCat :=
   {
     I := Nat.zero
-    hom := Nat.zero_le
+    u := Nat.zero_le
     unique _ _ := rfl
   }
 
@@ -41,7 +41,7 @@ def natCat.pullback{A₁ A₂ B: natCat.Ob}
         | PullbackOb.B => Nat.le_trans (Nat.min_le_left A₁ A₂) f₁
       comm _ := rfl
     }
-    hom X := {
+    u X := {
       h := Nat.le_min.2 (And.intro (X.π PullbackOb.A₁) (X.π PullbackOb.A₂))
       fac _ := rfl
     }

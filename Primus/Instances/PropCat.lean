@@ -18,7 +18,7 @@ def propCat: Cat.{1, 0} := {
 
 def propCat.initial: InitialObject propCat := {
   I := False
-  hom X := False.elim
+  u X := False.elim
   unique X g := by
     funext x
     exact x.elim
@@ -26,7 +26,7 @@ def propCat.initial: InitialObject propCat := {
 
 def propCat.terminal: TerminalObject propCat := {
   T := True
-  hom _ _ := True.intro
+  u _ _ := True.intro
   unique _ _ := rfl
 }
 
@@ -45,7 +45,7 @@ def propCat.lim{JJ: Cat}(F: Fun JJ propCat): Lim F := {
     π J H := H J
     comm _ := rfl
   }
-  hom X := {
+  u X := {
     h n J := X.π J n
     fac _ := rfl
   }
@@ -58,7 +58,7 @@ def propCat.coLim{JJ: Cat}(F: Fun JJ propCat): CoLim F := {
     π J H := ⟨J, H⟩
     comm _ := rfl
   }
-  hom X := {
+  u X := {
     h := λ⟨J, n⟩ ↦ X.π J n
     fac _ := rfl
   }
