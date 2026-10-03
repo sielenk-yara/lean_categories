@@ -67,6 +67,37 @@ def Fun.compose{AA BB CC: Cat}(G: Fun BB CC)(F: Fun AA BB): Fun AA CC := {
     preserves_compose := by simp
 }
 
+theorem Fun.left_id{CC DD: Cat}(F: Fun CC DD):
+  compose (id DD) F = F
+:= by
+  apply Fun.ext
+  intro A
+  rfl
+  intros A B f
+  apply heq_of_eq
+  rfl
+
+theorem Fun.right_id{CC DD: Cat}(F: Fun CC DD):
+  compose F (id CC) = F
+:= by
+  apply Fun.ext
+  intro A
+  rfl
+  intros A B f
+  apply heq_of_eq
+  rfl
+
+theorem Fun.assoc{AA BB CC DD: Cat}(H: Fun CC DD)(G: Fun BB CC)(F: Fun AA BB):
+         compose H (compose G F) = compose (compose H G) F
+:= by
+  apply Fun.ext
+  intro A
+  rfl
+  intros A B f
+  apply heq_of_eq
+  rfl
+
+
 /-- The `checkUnivs` warning on this declaration is a false positive, so do not
     "fix" it by collapsing `m` and `n` into one level. The linter only inspects
     the *type*, where the two occur solely as `max m n`; the body uses them
@@ -77,9 +108,9 @@ def categoryCat.{m, n} : Cat.{(max m n) + 1, max 1 (max m n)} := {
   Hom := Fun.{m, n, m, n}
   id := Fun.id,
   compose := Fun.compose,
-  left_id _ := by funext; rfl,
-  right_id _ := by funext; rfl,
-  assoc _ _ _ := by funext; rfl
+  left_id := Fun.left_id,
+  right_id := Fun.right_id,
+  assoc := Fun.assoc
 }
 
 def categoryCat.terminal: TerminalObject categoryCat := {

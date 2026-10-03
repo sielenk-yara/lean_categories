@@ -147,9 +147,8 @@ theorem coneCat_equivalent_overCat{JJ: Cat}(F: Fun JJ CC):
     refine ⟨ConeOb.mk B.B B.h.η ?comm, ?isomorphic⟩
     case comm =>
       intros J₁ J₂ f
-      apply Eq.trans (Eq.symm (B.h.naturality f))
-      apply CC.right_id
+      apply Eq.trans (Eq.symm (B.h.naturality f)) (CC.right_id _)
     case isomorphic =>
       refine iso_to_isomorphic ⟨CC.id B.B, ?_⟩ (id_is_iso _)
-      . apply Eq.trans (Cat.right_id _ _)
-        apply NaturalTransformation.ext (Eq.refl _)
+      apply Eq.trans (Cat.right_id _ B.h)
+      apply NaturalTransformation.ext (Eq.refl _)

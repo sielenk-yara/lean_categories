@@ -78,6 +78,30 @@ theorem TerminalObject.ext{CC: Cat}{A B: TerminalObject CC}:
     apply Hb
 
 
+structure Cat.Iso(CC: Cat)(A B: CC.Ob) : Sort _ where
+  f: CC.Hom A B
+  g: CC.Hom B A
+  gf_is_id : g ≪ f = CC.id A
+  fg_is_id : f ≪ g = CC.id B
+
+def Cat.Iso.inverse{CC: Cat}{A B: CC.Ob}:
+  CC.Iso A B -> CC.Iso B A
+:= by
+  intro ⟨f, g, H1, H2⟩
+  exact ⟨g, f, H2, H1⟩
+
+@[ext]
+theorem Cat.Iso.ext{CC: Cat}{A B: CC.Ob}{i₁ i₂: CC.Iso A B}:
+  i₁.f = i₂.f -> i₁ = i₂
+:= by
+  let ⟨f₁, g₁, Hfg₁, Hgf₁⟩ := i₁
+  let ⟨f₂, g₂, Hfg₂, Hgf₂⟩ := i₂
+  simp only [mk.injEq]
+  intro H1
+  and_intros
+  . assumption
+  . rw [←CC.left_id g₁, ←Hfg₂, ←H1, ←CC.assoc, Hgf₁, CC.right_id]
+
 @[reducible] def isomorphic{CC: Cat}(A B: CC.Ob): Prop :=
   ∃(f: CC.Hom A B)(g: CC.Hom B A), f ≫ g = CC.id A ∧ g ≫ f = CC.id B
 
@@ -99,14 +123,14 @@ section MorphismProperties
   def epi: Prop :=
     ∀{X: CC.Ob}{g1 g2: CC.Hom B X}, g1 ≪ f = g2 ≪ f → g1 = g2
 
+  def inverse(g: CC.Hom B A): Prop :=
+    g ≪ f = CC.id A ∧ f ≪ g = CC.id B
+
   def splitMono: Prop :=
     ∃(g: CC.Hom B A), g ≪ f = CC.id A
 
   def splitEpi: Prop :=
     ∃(g: CC.Hom B A), f ≪ g = CC.id B
-
-  def inverse(g: CC.Hom B A): Prop :=
-    g ≪ f = CC.id A ∧ f ≪ g = CC.id B
 
   def iso: Prop :=
     ∃(g: CC.Hom B A), inverse f g
@@ -149,8 +173,5 @@ theorem iso_to_isomorphic{CC: Cat}{A B: CC.Ob}(f: CC.Hom A B):
   exists f
   exists g
 
-theorem id_is_iso{CC: Cat}(A: CC.Ob): iso (CC.id A) := by
-  exists CC.id A
-  and_intros
-  apply CC.left_id
-  apply CC.left_id
+def id_as_iso{CC: Cat}(A: CC.Ob): CC.Iso A A :=
+  ⟨CC.id A, CC.id A, CC.left_id _, CC.left_id _⟩
