@@ -4,7 +4,7 @@ import Primus.Core.Functor
 @[ext]
 structure NaturalTransformation{CC DD: Cat}(F G: Fun CC DD): Sort _ where
   η: (A: CC.Ob) -> DD.Hom (F A) (G A)
-  naturality{A B: CC.Ob}(f: CC.Hom A B): η B ≪ F.onHom f = G.onHom f ≪ η A
+  naturality{A B}(f: CC.Hom A B): η B ≪ F.onHom f = G.onHom f ≪ η A
 
 instance {CC DD: Cat} {F G: Fun CC DD} :
     CoeFun (NaturalTransformation F G) (λ _ => ∀ A : CC.Ob, DD.Hom (F A) (G A)) where

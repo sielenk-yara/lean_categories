@@ -2,6 +2,7 @@ import Primus.Core.Category
 import Primus.Core.Functor
 import Primus.Core.Delta
 import Primus.Limits.Cone
+import Primus.Core.IsoFun
 
 
 variable {CC DD: Cat}
@@ -98,58 +99,80 @@ abbrev CoUniversalMorphism(G: Fun DD CC)(X: CC.Ob) :=
 abbrev Lim'{JJ: Cat}(F: Fun JJ CC) :=
   CoUniversalMorphism (deltaFun JJ CC) F
 
-theorem coneCat_equivalent_overCat{JJ: Cat}(F: Fun JJ CC):
-  equivalent (coneCat F) (overCat (deltaFun JJ CC) F)
-:= by
-  let AA := (coneCat F)
-  let BB := (overCat (deltaFun JJ CC) F)
-  change equivalent AA BB
-  let onOb : AA.Ob → BB.Ob := by
-      intro ⟨N, π, comm⟩
-      refine ⟨N, ⟨π, ?_⟩⟩
-      intros J₁ J₂ f
-      change _ ≪ CC.id N = _
-      rw [CC.right_id, ←comm f]
-      rfl
-  let onHom : {A B : AA.Ob} → AA.Hom A B → BB.Hom (onOb A) (onOb B) := by
-      intro ⟨A, Aπ, Acomm⟩ ⟨B, Bπ, Bcomm⟩ ⟨h, fac⟩
-      change CC.Hom A B at h
-      change ∀ J, Bπ J ≪ _ = Aπ J at fac
-      refine ⟨h, ?_⟩
-      apply NaturalTransformation.ext
-      change (Bπ · ≪ h) = Aπ
-      funext J
-      apply fac
 
-  refine ⟨{
-    onOb := onOb
-    onHom := onHom
+def isoFun_coneCat_overCat{JJ: Cat}(F: Fun JJ CC):
+  IsoFun (coneCat F) (overCat (deltaFun JJ CC) F)
+:= {
+  F := {
+    onOb A := by
+      refine ⟨A.N, A.π, ?_⟩
+      intros J₁ J₂ f
+      change _ ≪ CC.id A.N = _
+      rw [CC.right_id, ←A.comm f]
+      rfl
+
+    onHom := by
+      intro A B f
+      refine ⟨f.h, ?_⟩
+      apply NaturalTransformation.ext
+      change (B.π · ≪ f.h) = A.π
+      funext J
+      apply f.fac
+
     preserves_id := by
       intro A
       apply OverHom.ext
       rfl
+
     preserves_compose := by
       intros A B C g f
       apply OverHom.ext
       rfl
-  }, ⟨⟨?full, ?faithful⟩, ?essentiallySurjective⟩⟩
-  case full =>
-    intro A B h
-    refine ⟨⟨h.f, λ J => ?_⟩, rfl⟩
-    rw [←NaturalTransformation.mk.inj h.comm]
-    rfl
-  case faithful =>
-    intros A B f₁ f₂ H
-    apply ConeHom.ext (OverHom.mk.inj H)
-  case essentiallySurjective =>
-    intro B
-    simp only
-    refine ⟨ConeOb.mk B.B B.h.η ?comm, ?isomorphic⟩
-    case comm =>
+
+  }
+
+  G := {
+    onOb A := by
+      refine ⟨A.B, λ J => A.h.η J, ?comm⟩
       intros J₁ J₂ f
-      apply Eq.trans (Eq.symm (B.h.naturality f))
-      apply CC.right_id
-    case isomorphic =>
-      refine iso_to_isomorphic ⟨CC.id B.B, ?_⟩ (id_is_iso _)
-      . apply Eq.trans (Cat.right_id _ _)
-        apply NaturalTransformation.ext (Eq.refl _)
+      let g₁: CC.Hom A.B _ := F.onHom f ≪ A.h.η J₁
+      let g₂: CC.Hom A.B _ := A.h.η J₂
+      have H1 := A.h.naturality f
+      change g₂ ≪ CC.id _ = g₁ at H1
+      change g₁ = g₂
+      rw [←H1, CC.right_id]
+
+    onHom := by
+      intro A B f
+      refine ⟨f.f, ?_⟩
+      have H1 : B.h ≪ _ = A.h := f.comm
+      change ∀ J, B.h.η J ≪ f.f = A.h.η J
+      intros J
+      rw [←H1]
+      rfl
+
+    preserves_id := by
+      intro A
+      apply ConeHom.ext
+      rfl
+
+    preserves_compose := by
+      intros A B C g f
+      apply ConeHom.ext
+      rfl
+  }
+
+  GF_is_id := by
+    apply Fun.ext
+    intro A
+    rfl
+    intro A B f
+    rfl
+
+  FG_is_id := by
+    apply Fun.ext
+    intro A
+    rfl
+    intro A B f
+    rfl
+}
