@@ -71,6 +71,7 @@ def yonedaEmbedding CC:
     intro B C D h g
     congr
     funext A f
+    simp only
     rw [CC.assoc]
 }
 
