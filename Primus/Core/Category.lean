@@ -78,6 +78,31 @@ theorem TerminalObject.ext{CC: Cat}{A B: TerminalObject CC}:
     apply Hb
 
 
+structure Cat.Iso(CC: Cat)(A B: CC.Ob) : Sort _ where
+  f: CC.Hom A B
+  g: CC.Hom B A
+  gf_is_id : g ≪ f = CC.id A
+  fg_is_id : f ≪ g = CC.id B
+
+def Cat.Iso.inverse{CC: Cat}{A B: CC.Ob}:
+  CC.Iso A B -> CC.Iso B A
+:= by
+  intro ⟨f, g, H1, H2⟩
+  exact ⟨g, f, H2, H1⟩
+
+@[ext]
+theorem Cat.Iso.ext{CC: Cat}{A B: CC.Ob}{i₁ i₂: CC.Iso A B}:
+  i₁.f = i₂.f -> i₁ = i₂
+:= by
+  let ⟨f₁, g₁, Hfg₁, Hgf₁⟩ := i₁
+  let ⟨f₂, g₂, Hfg₂, Hgf₂⟩ := i₂
+  simp only [mk.injEq]
+  intro H1
+  and_intros
+  . assumption
+  . rw [←CC.left_id g₁, ←Hfg₂, ←H1, ←CC.assoc, Hgf₁, CC.right_id]
+
+
 @[reducible] def isomorphic{CC: Cat}(A B: CC.Ob): Prop :=
   ∃(f: CC.Hom A B)(g: CC.Hom B A), f ≫ g = CC.id A ∧ g ≫ f = CC.id B
 
@@ -112,6 +137,19 @@ section MorphismProperties
     ∃(g: CC.Hom B A), inverse f g
 
 end MorphismProperties
+
+
+theorem Cat.Iso.is_mono{CC: Cat}{A B: CC.Ob}(i: CC.Iso A B):
+  mono i.f
+:= by
+  intros C g₁ g₂ H1
+  rw [←CC.left_id g₁, ←i.gf_is_id, ←CC.assoc, H1, CC.assoc, i.gf_is_id, CC.left_id g₂]
+
+theorem Cat.Iso.is_epi{CC: Cat}{A B: CC.Ob}(i: CC.Iso A B):
+  epi i.f
+:= by
+  intros C g₁ g₂ H1
+  rw [←CC.right_id g₁, ←i.fg_is_id, CC.assoc, H1, ←CC.assoc, i.fg_is_id, CC.right_id g₂]
 
 
 theorem split_mono_to_mono{CC: Cat}{A B: CC.Ob}(f: CC.Hom A B):
