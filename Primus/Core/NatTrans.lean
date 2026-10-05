@@ -97,3 +97,19 @@ def NaturalIso.ofIso{CC DD: Cat}{F G: Fun CC DD}(i: (functorCat CC DD).Iso F G):
   ⟩
   naturality := i.f.naturality
 }
+
+
+theorem NaturalIso.toIso_ofIso{CC DD: Cat}{F G: Fun CC DD}(i: (functorCat CC DD).Iso F G):
+  toIso (ofIso i) = i
+:= by
+  apply Cat.Iso.ext
+  apply NaturalTransformation.ext
+  funext A
+  rfl
+
+theorem NaturalIso.ofIso_toIso{CC DD: Cat}{F G: Fun CC DD}(n: NaturalIso F G):
+  ofIso n.toIso = n
+:= by
+  apply NaturalIso.ext
+  funext A
+  rfl
