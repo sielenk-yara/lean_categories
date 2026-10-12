@@ -192,3 +192,20 @@ theorem id_is_iso{CC: Cat}(A: CC.Ob): iso (CC.id A) := by
   and_intros
   apply CC.left_id
   apply CC.left_id
+
+
+def Cat.Iso.of_split_mono{CC: Cat}{A B: CC.Ob}(f: CC.Hom A B)(g: CC.Hom B A):
+  g ≪ f = CC.id A -> epi f -> CC.Iso A B
+:= by
+  intro H1 H2
+  refine ⟨f, g, H1, H2 ?_⟩
+  rw [←CC.assoc, H1]
+  simp only [right_id, left_id]
+
+def Cat.Iso.of_split_epi{CC: Cat}{A B: CC.Ob}(f: CC.Hom A B)(g: CC.Hom B A):
+  f ≪ g = CC.id B -> mono f -> CC.Iso A B
+:= by
+  intro H1 H2
+  refine ⟨f, g, H2 ?_, H1⟩
+  rw [CC.assoc, H1]
+  simp only [right_id, left_id]
