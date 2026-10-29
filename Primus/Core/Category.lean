@@ -11,7 +11,7 @@ structure Cat.{m, n}: Sort _ where
 attribute [simp] Cat.left_id Cat.right_id Cat.assoc
 
 infixl:80 " ≪ " => Cat.compose _
-infixl:80 " ≫ " => fun f g => g ≪ f
+infixl:80 " ≫ " => λ f g => g ≪ f
 
 open Lean PrettyPrinter in
 @[app_unexpander Cat.compose]

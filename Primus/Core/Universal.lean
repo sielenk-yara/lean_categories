@@ -107,7 +107,7 @@ def isoFun_coneCat_overCat{JJ: Cat}(F: Fun JJ CC):
     onOb A := by
       refine ⟨A.N, A.π, ?_⟩
       intros J₁ J₂ f
-      change _ ≪ CC.id A.N = _
+      show _ ≪ CC.id A.N = _
       rw [CC.right_id, ←A.comm f]
       rfl
 
@@ -115,7 +115,7 @@ def isoFun_coneCat_overCat{JJ: Cat}(F: Fun JJ CC):
       intro A B f
       refine ⟨f.h, ?_⟩
       apply NaturalTransformation.ext
-      change (B.π · ≪ f.h) = A.π
+      show (B.π · ≪ f.h) = A.π
       funext J
       apply f.fac
 
@@ -139,14 +139,14 @@ def isoFun_coneCat_overCat{JJ: Cat}(F: Fun JJ CC):
       let g₂: CC.Hom A.B _ := A.h.η J₂
       have H1 := A.h.naturality f
       change g₂ ≪ CC.id _ = g₁ at H1
-      change g₁ = g₂
+      show g₁ = g₂
       rw [←H1, CC.right_id]
 
     onHom := by
       intro A B f
       refine ⟨f.f, ?_⟩
       have H1 : B.h ≪ _ = A.h := f.comm
-      change ∀ J, B.h.η J ≪ f.f = A.h.η J
+      show ∀ J, B.h.η J ≪ f.f = A.h.η J
       intros J
       rw [←H1]
       rfl

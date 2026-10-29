@@ -59,7 +59,7 @@ def propCat.coLim{JJ: Cat}(F: Fun JJ propCat): CoLim F := {
     comm _ := rfl
   }
   u X := {
-    h := λ⟨J, n⟩ ↦ X.π J n
+    h := λ ⟨J, n⟩ ↦ X.π J n
     fac _ := rfl
   }
   unique _ _ := rfl

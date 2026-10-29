@@ -29,12 +29,12 @@ def NaturalIso.inverse{CC DD: Cat}{F G: Fun CC DD}:
   let i₁ := (nt.η A).inverse
   let i₂ := (nt.η B).inverse
   have H1 : i₂.g ≪ _ = _ ≪ i₁.g := nt.naturality f
-  change i₂.f ≪ G.onHom f = F.onHom f ≪ i₁.f
+  show i₂.f ≪ G.onHom f = F.onHom f ≪ i₁.f
   have H3 : i₂.g ≪ i₂.f ≪ G.onHom f ≪ i₁.g = i₂.g ≪ F.onHom f ≪ i₁.f ≪ i₁.g := by
     rw [H1, i₂.gf_is_id, DD.left_id, ←DD.assoc, i₁.fg_is_id, DD.right_id]
   apply i₂.inverse.is_mono
   apply i₁.inverse.is_epi
-  change i₂.g ≪ _≪ i₁.g = i₂.g ≪ _ ≪ i₁.g
+  show i₂.g ≪ _≪ i₁.g = i₂.g ≪ _ ≪ i₁.g
   rw [DD.assoc, H3, DD.assoc]
 
 
@@ -86,15 +86,16 @@ def NaturalIso.toIso{CC DD: Cat}{F G: Fun CC DD}(n: NaturalIso F G): (functorCat
 }
 
 def NaturalIso.ofIso{CC DD: Cat}{F G: Fun CC DD}(i: (functorCat CC DD).Iso F G): NaturalIso F G := {
-  η A := ⟨i.f.η A, i.g.η A, by
-    change (i.g ≪ i.f).η A = _
-    rw [i.gf_is_id]
-    rfl
-  , by
-    change (i.f ≪ i.g).η A = _
-    rw [i.fg_is_id]
-    rfl
-  ⟩
+  η A := ⟨i.f.η A, i.g.η A
+    , by
+      show (i.g ≪ i.f).η A = _
+      rw [i.gf_is_id]
+      rfl
+    , by
+      show (i.f ≪ i.g).η A = _
+      rw [i.fg_is_id]
+      rfl
+    ⟩
   naturality := i.f.naturality
 }
 
@@ -119,7 +120,7 @@ def NaturalIso.ofEq{CC DD: Cat}{F G: Fun CC DD}(H: F = G):
   NaturalIso F G
 := by
   subst H
-  refine ⟨λA => id_as_iso (F A), λf => ?_⟩
+  refine ⟨λ A => id_as_iso (F A), λ f => ?_⟩
   simp only [id_as_iso, DD.left_id, DD.right_id]
 
 theorem NaturalIso.ofEq_eta{CC DD: Cat}{F G: Fun CC DD}(H: F = G)(A: CC.Ob):

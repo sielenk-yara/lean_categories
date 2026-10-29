@@ -20,12 +20,12 @@ def homFun.{m, n}{CC: Cat.{m, n}}(X: CC.Ob): Fun (op CC) sortCat.{n} := {
 def yonedaDown{CC: Cat}(F: Fun (op CC) sortCat)(X: CC.Ob):
   sortCat.Hom (NaturalTransformation (homFun X) F) (F X)
 :=
-  fun nt => nt X (CC.id X)
+  λnt => nt X (CC.id X)
 
 def yonedaUp{CC: Cat}(F: Fun (op CC) sortCat)(X: CC.Ob):
   sortCat.Hom (F X) (NaturalTransformation (homFun X) F)
 :=
-  fun x => {
+  λ x => {
     η Y f := F.onHom f x,
     naturality{A B} f := by
       funext g
@@ -41,7 +41,7 @@ def yoneda{CC: Cat}(F: Fun (op CC) sortCat)(X: CC.Ob):
     <;> simp only [sortCat, yonedaDown, yonedaUp, Fun.preserves_id]
   funext ⟨η, H⟩; simp [homFun] at η H
   ext A f
-  show (λx => F.onHom f (η X x)) (CC.id X) = η A f
+  show (λ x => F.onHom f (η X x)) (CC.id X) = η A f
   rw [←H f]
   simp only
   rw [CC.left_id f]
@@ -75,8 +75,8 @@ theorem yonedaEmbedding.is_faithful CC:
 := by
   intro X Y f1 f2 H1
   let ye := yonedaEmbedding CC
-  let nt₁ := (ye.onHom f1)
-  let nt₂ := (ye.onHom f2)
+  let nt₁ := ye.onHom f1
+  let nt₂ := ye.onHom f2
   change nt₁ = nt₂ at H1
   have H2: nt₁.η X (CC.id X) = nt₂.η X (CC.id X) := by rw [H1]
   simp only [yonedaEmbedding, Cat.right_id, ye, nt₁, nt₂] at H2
@@ -92,7 +92,7 @@ theorem yonedaEmbedding.is_full CC:
   funext Z f
   let g: CC.Hom X X → CC.Hom Z Y := λ h ↦ (nt.η X h) ≪ f
   have H1 : (λ h ↦ nt.η Z (h ≪ f)) = g := nt.naturality f
-  change g (CC.id X) = _
+  show g (CC.id X) = _
   rw [←H1]
   simp only [Cat.left_id]
   eq_refl

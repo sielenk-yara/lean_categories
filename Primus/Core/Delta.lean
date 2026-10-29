@@ -26,7 +26,7 @@ theorem deltaFun.faithful{JJ CC}[HJ: Nonempty JJ.Ob]:
   intros A B f₁ f₂
   let ff₁ := (deltaFun JJ CC).onHom f₁
   let ff₂ := (deltaFun JJ CC).onHom f₂
-  change ff₁ = ff₂ → _
+  show ff₁ = ff₂ → _
   intro H
   apply HJ.elim
   intro J

@@ -9,7 +9,7 @@ variable {JJ CC: Cat}
 structure ConeOb(F: Fun JJ CC): Sort _ where
   N: CC.Ob
   π J : CC.Hom N (F J)
-  comm{J₁ J₂}(f: JJ.Hom J₁ J₂): F.onHom f ≪ π J₁ = π J₂
+  comm{J₁ J₂}: ∀(f: JJ.Hom J₁ J₂), F.onHom f ≪ π J₁ = π J₂
 
 attribute [simp] ConeOb.comm
 
@@ -17,7 +17,7 @@ attribute [simp] ConeOb.comm
 @[ext]
 structure ConeHom{F}(X Y: @ConeOb JJ CC F): Sort _ where
   h: CC.Hom X.N Y.N
-  fac J: Y.π J ≪ h = X.π J
+  fac: ∀J, Y.π J ≪ h = X.π J
 
 attribute [simp] ConeHom.fac
 

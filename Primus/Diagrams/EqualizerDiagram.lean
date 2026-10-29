@@ -113,16 +113,16 @@ def Equalizer.mk{CC: Cat}{A B}(f₁ f₂: CC.Hom A B)
         fac J := match J with
           | EqualizerOb.A => Hh
           | EqualizerOb.B => by
-              change f₁ ≪ eq ≪ h = _
+              show f₁ ≪ eq ≪ h = _
               rw [←X.comm equalizerDiagram.f₁, ←Hh]
-              change _ = f₁ ≪ (eq ≪ h)
+              show _ = f₁ ≪ (eq ≪ h)
               rw [CC.assoc]
       }
 
     unique X g := by
       let ⟨h, Hh⟩ := H2' X
       apply ConeHom.ext
-      change g.h = h
+      show g.h = h
       have Hg: eq ≪ g.h = X.π equalizerDiagram.A := g.fac equalizerDiagram.A
       rw [←Hg] at Hh
       apply Eq.symm
@@ -154,9 +154,9 @@ theorem Equalizer.eq_is_mono{CC: Cat}{A B: CC.Ob}{f₁ f₂: CC.Hom A B}(E: Equa
     case A =>
       exact Hu.symm
     case B =>
-      change E.T.π equalizerDiagram.B ≪ u₂ = E.T.π equalizerDiagram.B ≪ u₁
+      show E.T.π equalizerDiagram.B ≪ u₂ = E.T.π equalizerDiagram.B ≪ u₁
       rw [←E.T.comm EqualizerHom.f₁, ←CC.assoc, ←CC.assoc]
-      change _ ≪ (E.eq ≪ u₂) = _ ≪ (E.eq ≪ u₁)
+      show _ ≪ (E.eq ≪ u₂) = _ ≪ (E.eq ≪ u₁)
       rw [Hu]
     ⟩
   exact congrArg ConeHom.h (E.hom_ext g₁ g₂)
@@ -200,9 +200,9 @@ def CoEqualizer.mk{CC: Cat}{A B}(f₁ f₂: CC.Hom A B)
         h := h,
         fac J := match J with
           | EqualizerOb.A => by
-              change h ≪ (q ≪ f₁) = _
+              show h ≪ (q ≪ f₁) = _
               rw [←X.comm equalizerDiagram.f₁, ←Hh]
-              change _ = h ≪ q ≪ f₁
+              show _ = h ≪ q ≪ f₁
               rw [CC.assoc]
           | EqualizerOb.B => Hh
       }
@@ -210,7 +210,7 @@ def CoEqualizer.mk{CC: Cat}{A B}(f₁ f₂: CC.Hom A B)
     unique X g := by
       let ⟨h, Hh⟩ := H2' X
       apply CoConeHom.ext
-      change g.h = h
+      show g.h = h
       have Hg: g.h ≪ q = X.π equalizerDiagram.B := g.fac equalizerDiagram.B
       rw [←Hg] at Hh
       apply Eq.symm
@@ -243,9 +243,9 @@ theorem CoEqualizer.q_is_epi{CC: Cat}{A B: CC.Ob}{f₁ f₂: CC.Hom A B}(E: CoEq
   let g₂: CoConeHom E.I X := ⟨u₂, λ J => by
     cases J
     case A =>
-      change u₂ ≪ E.I.π equalizerDiagram.A = u₁ ≪ E.I.π equalizerDiagram.A
+      show u₂ ≪ E.I.π equalizerDiagram.A = u₁ ≪ E.I.π equalizerDiagram.A
       rw [←E.I.comm EqualizerHom.f₁, CC.assoc, CC.assoc]
-      change _ ≪ E.q ≪ f₁ = _ ≪ E.q ≪ f₁
+      show _ ≪ E.q ≪ f₁ = _ ≪ E.q ≪ f₁
       rw [Hu]
     case B =>
       exact Hu.symm
