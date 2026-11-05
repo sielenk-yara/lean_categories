@@ -195,3 +195,34 @@ theorem full_comp{AA BB CC}(G: Fun BB CC)(F: Fun AA BB):
 
 def equivalent(CC DD: Cat): Prop :=
   ∃(F: Fun CC DD), equivalence F
+
+
+def Cat.core_inclusion CC: Fun CC.core CC := {
+  onOb A := A
+  onHom i := i.f
+  preserves_id := (Cat.core.id_f _).symm
+  preserves_compose := Cat.core.compose_f _ _
+}
+
+theorem Cat.core_inclusion.faithful(CC: Cat):
+  faithful CC.core_inclusion
+:= by
+  intros A B f₁ f₂ H
+  apply Cat.Iso.ext H
+
+
+def Cat.core_functor: Fun categoryCat categoryCat := {
+  onOb := Cat.core
+  onHom := Fun.core
+  preserves_id := by
+    intro A
+    rfl
+  preserves_compose := by
+    intros A B C g f
+    rfl
+}
+
+theorem Fun.core_inclusion_naturality{CC DD: Cat}(F: Fun CC DD):
+  DD.core_inclusion.compose F.core = F.compose CC.core_inclusion
+:= by
+  ext A B i <;> rfl

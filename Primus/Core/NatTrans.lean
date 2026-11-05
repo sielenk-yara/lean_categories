@@ -121,3 +121,11 @@ def NaturalIso.trans{CC DD: Cat}{F G H: Fun CC DD}:
 instance{CC DD: Cat}: Trans (@NaturalIso CC DD) NaturalIso NaturalIso
 where
   trans := NaturalIso.trans
+
+
+def NaturalTransformation.core:
+  NaturalTransformation Cat.core_functor (Fun.id categoryCat)
+:= {
+  η := Cat.core_inclusion,
+  naturality := Fun.core_inclusion_naturality
+}
