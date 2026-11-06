@@ -175,22 +175,22 @@ def categoryCat.initial: InitialObject categoryCat := {
 
 
 theorem faithful_comp{AA BB CC}(G: Fun BB CC)(F: Fun AA BB):
-  faithful F -> faithful G → faithful (categoryCat.compose G F)
+  faithful F → faithful G → faithful (categoryCat.compose G F)
 := by
   intro H1 H2 A B f1 f2 H3
   apply H1
   apply H2
-  assumption
+  apply H3
 
 theorem full_comp{AA BB CC}(G: Fun BB CC)(F: Fun AA BB):
-  full F -> full G → full (categoryCat.compose G F)
+  full F → full G → full (categoryCat.compose G F)
 := by
   intro H1 H2 A B g
   let ⟨a, H3⟩ := (H2 g)
   let ⟨b, H4⟩ := (H1 a)
   exists b
   rw [←H3, ←H4]
-  simp only [categoryCat, Fun.compose]
+  rfl
 
 
 def equivalent(CC DD: Cat): Prop :=
